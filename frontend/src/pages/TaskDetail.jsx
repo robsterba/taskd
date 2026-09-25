@@ -111,17 +111,7 @@ function TaskDetail({
   // Fetch full task details
   useEffect(() => {
     const fetchFullTask = async () => {
-      // First try to find in the tasks array
-      if (tasks && taskId) {
-        const foundTask = tasks.find(t => t.id === taskId)
-        if (foundTask) {
-          setTask(foundTask)
-          setEditData(foundTask)
-          return
-        }
-      }
-      
-      // If not found in tasks array, fetch from API
+      // Always fetch from API to get full details including subtasks
       if (taskId) {
         try {
           const response = await fetch(`${API_BASE}/tasks/${taskId}`)
@@ -129,9 +119,19 @@ function TaskDetail({
             const data = await response.json()
             setTask(data)
             setEditData(data)
+            return
           }
         } catch (err) {
           console.error('Failed to fetch task details:', err)
+        }
+        
+        // Fallback: try to find in the tasks array
+        if (tasks) {
+          const foundTask = tasks.find(t => t.id === taskId)
+          if (foundTask) {
+            setTask(foundTask)
+            setEditData(foundTask)
+          }
         }
       }
     }
