@@ -125,25 +125,68 @@ Example: `Buy groceries #shopping !high`
 
 ## n8n Integration
 
-### Creating Tasks
+taskd is designed to work seamlessly with [n8n](https://n8n.io), the open-source workflow automation tool. The API endpoints are purpose-built for n8n HTTP Request nodes.
 
-Use the HTTP Request node to POST to `/api/v1/tasks`:
+### Recommended Conventions
+
+When creating tasks from n8n workflows:
+- Always include `"source": "n8n"` (or your workflow name) to identify automated tasks
+- Use the `"tags": ["automated", ...]` pattern to make automation tasks filterable in the GUI
+- Tag by workflow purpose: `"backup"`, `"monitoring"`, `"alert"`, etc.
+
+### Example: Creating Tasks
+
+Use an HTTP Request node to POST to `/api/v1/tasks`:
 
 ```json
 {
   "name": "Backup database",
   "description": "Daily backup of production database",
-  "tags": ["automated", "backup"],
+  "tags": ["automated", "backup", "daily"],
   "source": "n8n",
-  "priority": "high"
+  "priority": "high",
+  "due_date": "2026-09-26T02:00:00Z"
 }
 ```
 
-### Polling for Changes
+### Example: Monitoring for Task Completions
 
-Use a Schedule Trigger with the HTTP Request node to GET `/api/v1/tasks/changed?since={{ $now }}`:
+Many n8n workflows need to trigger when tasks reach certain states. Use a **Schedule Trigger** (e.g., every 5 minutes) with an HTTP Request node:
 
-This returns all tasks updated since the specified timestamp.
+**Method:** GET
+**URL:** `/api/v1/tasks/changed?since={{ $now.subtract(5, 'minutes') }}`
+
+This returns all tasks updated in the last 5 minutes. Then use an **IF** node to filter for:
+- `status === "done"`
+- `tags.includes("automated")`
+- `source === "n8n"`
+
+### Example: Agentic Workflows
+
+Build workflows that react to task state changes:
+
+1. **Trigger:** Schedule every 1-5 minutes
+2. **Action:** GET `/api/v1/tasks/changed?since={{ $now.subtract(5, 'minutes') }}`
+3. **Filter:** Tasks with `status === "done"` AND `tags.includes("automated")`
+4. **Execute:** Your automation logic (e.g., send notification, trigger shutdown, etc.)
+
+### Example: Daily Digest
+
+Create a workflow that sends a daily summary:
+
+1. **Trigger:** Schedule at 9:00 AM daily
+2. **Action:** GET `/api/v1/tasks?due_before={{ $now.endOfDay() }}&status=todo`
+3. **Process:** Format the results into a summary
+4. **Deliver:** Send via email, Slack, or your preferred channel
+
+### Example: Escalation Workflow
+
+Automatically escalate overdue high-priority tasks:
+
+1. **Trigger:** Schedule every hour
+2. **Action:** GET `/api/v1/tasks?status=todo&priority=high&due_before={{ $now }}`
+3. **Filter:** Tasks that are overdue
+4. **Action:** PATCH each task to add `"escalated"` tag and send alert
 
 ## Configuration
 
