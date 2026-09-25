@@ -11,7 +11,7 @@
 .not-found h1 {
   font-size: 6rem;
   font-weight: 700;
-  color: #c92a2a;
+  color: var(--accent-red);
   margin: 0;
   line-height: 1;
 }
@@ -19,19 +19,19 @@
 .not-found h2 {
   font-size: 1.5rem;
   font-weight: 500;
-  color: #333;
+  color: var(--text-primary);
   margin: 16px 0 8px;
 }
 
 .not-found p {
-  color: #666;
+  color: var(--text-secondary);
   font-size: 1.1rem;
   margin: 0 0 24px;
 }
 
 .not-found .back-button {
   padding: 12px 24px;
-  background: #007bff;
+  background: var(--accent-blue);
   color: white;
   border: none;
   border-radius: 8px;
@@ -40,5 +40,5 @@
 }
 
 .not-found .back-button:hover {
-  background: #0056b3;
+  opacity: 0.9;
 }

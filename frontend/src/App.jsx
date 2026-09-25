@@ -4,6 +4,7 @@ import TaskList from './pages/TaskList'
 import TaskDetail from './pages/TaskDetail'
 import NotFound from './pages/NotFound'
 import './App.css'
+import './index.css'
 import './pages/TaskList.css'
 import './pages/TaskDetail.css'
 import './pages/NotFound.css'
@@ -13,9 +14,31 @@ function App() {
   const [tags, setTags] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+  const [theme, setTheme] = useState(() => {
+    // Check localStorage first, then system preference
+    const savedTheme = localStorage.getItem('theme')
+    if (savedTheme) return savedTheme
+    
+    // Check system preference for dark mode
+    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+      return 'dark'
+    }
+    return 'light'
+  })
   const navigate = useNavigate()
 
   const API_BASE = '/api/v1'
+
+  // Apply theme on mount and when theme changes
+  useEffect(() => {
+    const root = window.document.documentElement
+    root.setAttribute('data-theme', theme)
+    localStorage.setItem('theme', theme)
+  }, [theme])
+
+  const toggleTheme = () => {
+    setTheme(prev => prev === 'light' ? 'dark' : 'light')
+  }
 
   const fetchTasks = async (params = {}) => {
     setLoading(true)
@@ -147,6 +170,17 @@ function App() {
     <div className="app">
       <header className="app-header">
         <h1 onClick={() => navigate('/')}>taskd</h1>
+        <div className="header-actions">
+          <button 
+            className="theme-toggle" 
+            onClick={toggleTheme}
+            aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
+          >
+            <span className="theme-toggle-icon">
+              {theme === 'light' ? '🌙' : '☀️'}
+            </span>
+          </button>
+        </div>
         {error && <div className="error-banner">{error}</div>}
       </header>
       

@@ -1,10 +1,11 @@
 .task-detail {
-  background: white;
+  background: var(--bg-secondary);
   border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow);
   overflow: hidden;
   max-width: 800px;
   margin: 0 auto;
+  border: 1px solid var(--border-color);
 }
 
 .task-detail-header {
@@ -12,22 +13,22 @@
   align-items: center;
   gap: 16px;
   padding: 20px 24px;
-  border-bottom: 1px solid #e0e0e0;
-  background: #f8f9fa;
+  border-bottom: 1px solid var(--border-color);
+  background: var(--bg-tertiary);
   flex-wrap: wrap;
 }
 
 .back-button {
-  background: white;
-  border: 1px solid #e0e0e0;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
   padding: 8px 16px;
   border-radius: 6px;
   font-size: 0.95rem;
-  color: #333;
+  color: var(--text-primary);
 }
 
 .back-button:hover {
-  background: #e9ecef;
+  background: var(--bg-tertiary);
 }
 
 .task-detail-title {
@@ -39,16 +40,18 @@
   font-size: 1.5rem;
   font-weight: 600;
   margin: 0;
-  color: #333;
+  color: var(--text-primary);
 }
 
 .task-detail-title .edit-input {
   width: 100%;
   padding: 8px 12px;
-  border: 2px solid #e0e0e0;
+  border: 2px solid var(--border-color);
   border-radius: 6px;
   font-size: 1.3rem;
   font-weight: 500;
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
 }
 
 .task-detail-actions {
@@ -65,33 +68,33 @@
 }
 
 .edit-button {
-  background: #e3f2fd;
-  color: #1976d2;
-  border: 1px solid #90caf9;
+  background: rgba(25, 118, 210, 0.15);
+  color: var(--accent-blue);
+  border: 1px solid rgba(144, 202, 249, 0.3);
 }
 
 .save-button {
-  background: #2e7d32;
+  background: var(--accent-green);
   color: white;
-  border: 1px solid #1b5e20;
+  border: 1px solid rgba(27, 94, 32, 0.3);
 }
 
 .cancel-button {
-  background: white;
-  color: #333;
-  border: 1px solid #e0e0e0;
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
 }
 
 .complete-button {
-  background: #2e7d32;
+  background: var(--accent-green);
   color: white;
-  border: 1px solid #1b5e20;
+  border: 1px solid rgba(27, 94, 32, 0.3);
 }
 
 .delete-button {
-  background: #c62828;
+  background: var(--accent-red);
   color: white;
-  border: 1px solid #8e0000;
+  border: 1px solid rgba(142, 0, 0, 0.3);
 }
 
 .task-detail-body {
@@ -105,19 +108,19 @@
 .task-detail-section h2 {
   font-size: 1.1rem;
   font-weight: 600;
-  color: #444;
+  color: var(--text-primary);
   margin-bottom: 12px;
   padding-bottom: 8px;
-  border-bottom: 1px solid #e0e0e0;
+  border-bottom: 1px solid var(--border-color);
 }
 
 .task-description {
   line-height: 1.6;
-  color: #444;
+  color: var(--text-primary);
 }
 
 .task-description .no-description {
-  color: #888;
+  color: var(--text-secondary);
   font-style: italic;
 }
 
@@ -145,7 +148,7 @@
 }
 
 .markdown a {
-  color: #007bff;
+  color: var(--accent-blue);
   text-decoration: underline;
 }
 
@@ -154,7 +157,7 @@
   flex-wrap: wrap;
   gap: 20px;
   padding: 16px;
-  background: #f8f9fa;
+  background: var(--bg-tertiary);
   border-radius: 8px;
 }
 
@@ -167,15 +170,17 @@
 .meta-group label {
   font-size: 0.85rem;
   font-weight: 500;
-  color: #666;
+  color: var(--text-secondary);
 }
 
 .meta-group select,
 .meta-group input[type="datetime-local"] {
   padding: 8px 12px;
-  border: 1px solid #e0e0e0;
+  border: 1px solid var(--border-color);
   border-radius: 6px;
   font-size: 0.9rem;
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
 }
 
 .meta-group input[type="datetime-local"] {
@@ -190,24 +195,24 @@
 }
 
 .status-badge.todo {
-  background: #e3f2fd;
-  color: #1976d2;
+  background: rgba(25, 118, 210, 0.15);
+  color: var(--accent-blue);
 }
 
 .status-badge.in_progress {
-  background: #e8f5e9;
-  color: #2e7d32;
+  background: rgba(46, 125, 50, 0.15);
+  color: var(--accent-green);
 }
 
 .status-badge.done {
-  background: #e8f5e9;
+  background: rgba(46, 125, 50, 0.15);
   color: #1b5e20;
   text-decoration: line-through;
 }
 
 .status-badge.archived {
-  background: #f5f5f5;
-  color: #757575;
+  background: var(--bg-tertiary);
+  color: var(--text-secondary);
 }
 
 .priority-badge {
@@ -218,36 +223,36 @@
 }
 
 .priority-badge.low {
-  background: #e2f0d9;
-  color: #5a8a3f;
+  background: rgba(90, 138, 63, 0.2);
+  color: var(--accent-green);
 }
 
 .priority-badge.medium {
-  background: #fff9db;
-  color: #b48817;
+  background: rgba(180, 136, 23, 0.2);
+  color: var(--accent-yellow);
 }
 
 .priority-badge.high {
-  background: #f8cecc;
+  background: rgba(184, 84, 80, 0.2);
   color: #b85450;
 }
 
 .priority-badge.urgent {
-  background: #fadbd8;
-  color: #9e2a23;
+  background: rgba(158, 42, 35, 0.2);
+  color: var(--accent-red);
 }
 
 .due-date {
   padding: 6px 12px;
-  background: #e3f2fd;
+  background: rgba(25, 118, 210, 0.15);
   border-radius: 16px;
   font-size: 0.85rem;
-  color: #1976d2;
+  color: var(--accent-blue);
 }
 
 .due-date.overdue {
-  background: #ffe6e6;
-  color: #c92a2a;
+  background: rgba(201, 42, 42, 0.15);
+  color: var(--accent-red);
 }
 
 .task-tags {
@@ -257,7 +262,7 @@
 }
 
 .task-tags .no-tags {
-  color: #888;
+  color: var(--text-secondary);
   font-style: italic;
   margin: 0;
 }
@@ -304,7 +309,7 @@
   align-items: center;
   gap: 12px;
   padding: 12px;
-  background: #f8f9fa;
+  background: var(--bg-tertiary);
   border-radius: 8px;
 }
 
@@ -320,6 +325,7 @@
 
 .subtask-name {
   flex: 1;
+  color: var(--text-primary);
 }
 
 .subtask-name.completed {
@@ -330,7 +336,7 @@
   display: flex;
   gap: 12px;
   font-size: 0.85rem;
-  color: #666;
+  color: var(--text-secondary);
 }
 
 .subtask-priority {
@@ -340,10 +346,10 @@
   font-weight: 500;
 }
 
-.subtask-priority.low { background: #e2f0d9; color: #5a8a3f; }
-.subtask-priority.medium { background: #fff9db; color: #b48817; }
-.subtask-priority.high { background: #f8cecc; color: #b85450; }
-.subtask-priority.urgent { background: #fadbd8; color: #9e2a23; }
+.subtask-priority.low { background: rgba(90, 138, 63, 0.2); color: var(--accent-green); }
+.subtask-priority.medium { background: rgba(180, 136, 23, 0.2); color: var(--accent-yellow); }
+.subtask-priority.high { background: rgba(184, 84, 80, 0.2); color: #b85450; }
+.subtask-priority.urgent { background: rgba(158, 42, 35, 0.2); color: var(--accent-red); }
 
 .add-subtask {
   display: flex;
@@ -354,13 +360,15 @@
 .add-subtask input {
   flex: 1;
   padding: 10px 12px;
-  border: 1px solid #e0e0e0;
+  border: 1px solid var(--border-color);
   border-radius: 6px;
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
 }
 
 .add-subtask button {
   padding: 10px 16px;
-  background: #2e7d32;
+  background: var(--accent-green);
   color: white;
   border: none;
   border-radius: 6px;
@@ -375,7 +383,7 @@
 .delete-subtask {
   background: none;
   border: none;
-  color: #c62828;
+  color: var(--accent-red);
   padding: 4px 8px;
   border-radius: 4px;
   cursor: pointer;
@@ -384,19 +392,19 @@
 }
 
 .delete-subtask:hover {
-  background: #ffebee;
+  background: rgba(201, 42, 42, 0.15);
 }
 
 .recurrence-info {
   padding: 16px;
-  background: #e3f2fd;
+  background: rgba(25, 118, 210, 0.15);
   border-radius: 8px;
 }
 
 .recurrence-badge {
   display: inline-block;
   padding: 6px 12px;
-  background: #007bff;
+  background: var(--accent-blue);
   color: white;
   border-radius: 16px;
   font-size: 0.85rem;
@@ -415,23 +423,24 @@
   justify-content: space-between;
   align-items: center;
   padding: 10px 16px;
-  background: #f8f9fa;
+  background: var(--bg-tertiary);
   border-radius: 8px;
 }
 
 .meta-item label {
   font-size: 0.85rem;
-  color: #666;
+  color: var(--text-secondary);
 }
 
 .meta-item span {
   font-weight: 500;
+  color: var(--text-primary);
 }
 
 .task-id {
   font-family: monospace;
   font-size: 0.8rem;
-  color: #666;
+  color: var(--text-secondary);
   word-break: break-all;
 }
 
@@ -439,31 +448,17 @@
   width: 100%;
   min-height: 100px;
   padding: 12px;
-  border: 2px solid #e0e0e0;
+  border: 2px solid var(--border-color);
   border-radius: 8px;
   font-family: inherit;
   font-size: 0.95rem;
   resize: vertical;
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
 }
 
 .edit-textarea:focus {
   outline: none;
-  border-color: #007bff;
+  border-color: var(--accent-blue);
   box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
-}
-
-.priority-urgent {
-  border-left: 4px solid #c92a2a;
-}
-
-.priority-high {
-  border-left: 4px solid #e74c3c;
-}
-
-.priority-medium {
-  border-left: 4px solid #f39c12;
-}
-
-.priority-low {
-  border-left: 4px solid #95a5a6;
 }
