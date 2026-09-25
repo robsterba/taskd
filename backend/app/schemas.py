@@ -70,8 +70,8 @@ class RecurrenceRule(BaseModel):
 class TaskBase(BaseModel):
     name: str = Field(..., min_length=1, max_length=500, description="Task name/title")
     description: Optional[str] = Field(None, description="Task description (supports markdown)")
-    status: TaskStatus = Field(default=TaskStatus.todo, description="Task status")
-    priority: TaskPriority = Field(default=TaskPriority.medium, description="Task priority")
+    status: Optional[TaskStatus] = Field(default=TaskStatus.todo, description="Task status")
+    priority: Optional[TaskPriority] = Field(default=TaskPriority.medium, description="Task priority")
     due_date: Optional[datetime] = Field(None, description="Due date in ISO 8601 format (UTC)")
     recurrence: Optional[RecurrenceRule] = Field(None, description="Recurrence rule")
     parent_task_id: Optional[str] = Field(None, description="Parent task ID for subtasks")

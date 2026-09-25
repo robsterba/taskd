@@ -64,11 +64,17 @@ def create_task(db: Session, task_data: TaskCreate, source: Optional[str] = None
     now = datetime.now(timezone.utc)
     task_dict = task_data.model_dump(exclude={"tags", "subtasks"})
     
-    # Override source if provided
+    # Apply defaults for optional fields that are None
+    if task_dict.get("priority") is None:
+        task_dict["priority"] = "medium"
+    if task_dict.get("status") is None:
+        task_dict["status"] = "todo"
+    if task_dict.get("source") is None:
+        task_dict["source"] = "api"
+    
+    # Override source if provided via header
     if source:
         task_dict["source"] = source
-    elif not task_dict.get("source"):
-        task_dict["source"] = "api"
     
     # Handle recurrence
     if task_data.recurrence:
