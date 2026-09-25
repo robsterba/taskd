@@ -73,17 +73,17 @@ const formatDueDate = (dueDate) => {
   if (!dueDate) return ''
   const date = new Date(dueDate)
   const now = new Date()
-  
+
   if (isSameDay(date, now)) {
     return 'Today'
   }
   if (isSameDay(date, new Date(now.getTime() + 24 * 60 * 60 * 1000))) {
     return 'Tomorrow'
   }
-  
-  return date.toLocaleDateString(undefined, { 
-    year: 'numeric', 
-    month: 'short', 
+
+  return date.toLocaleDateString(undefined, {
+    year: 'numeric',
+    month: 'short',
     day: 'numeric',
     hour: date.getHours() || date.getMinutes() ? '2-digit' : undefined,
     minute: date.getHours() || date.getMinutes() ? '2-digit' : undefined
@@ -125,7 +125,7 @@ function TaskDetail({
         } catch (err) {
           console.error('Failed to fetch task details:', err)
         }
-        
+
         // Fallback: try to find in the tasks array
         if (tasks) {
           const foundTask = tasks.find(t => t.id === taskId)
@@ -141,7 +141,7 @@ function TaskDetail({
 
   const handleSave = useCallback(async () => {
     if (!task || !task.id) return
-    
+
     setLoading(true)
     try {
       const updated = await onUpdateTask(task.id, editData)
@@ -161,7 +161,7 @@ function TaskDetail({
 
   const handleDelete = useCallback(async () => {
     if (!task || !task.id) return
-    
+
     if (window.confirm(`Are you sure you want to delete "${task.name}"? This will also delete all subtasks.`)) {
       setLoading(true)
       try {
@@ -177,7 +177,7 @@ function TaskDetail({
 
   const handleComplete = useCallback(async () => {
     if (!task || !task.id) return
-    
+
     setLoading(true)
     try {
       await onCompleteTask(task.id)
@@ -193,7 +193,7 @@ function TaskDetail({
 
   const handleAddSubtask = useCallback(async () => {
     if (!task || !task.id || !newSubtask.trim()) return
-    
+
     setLoading(true)
     try {
       const subtaskData = {
@@ -203,7 +203,7 @@ function TaskDetail({
         priority: 'medium',
         source: 'gui'
       }
-      
+
       const response = await fetch(`${API_BASE}/tasks`, {
         method: 'POST',
         headers: {
@@ -212,7 +212,7 @@ function TaskDetail({
         },
         body: JSON.stringify(subtaskData)
       })
-      
+
       if (response.ok) {
         setNewSubtask('')
         // Refresh the task
@@ -231,10 +231,10 @@ function TaskDetail({
 
   const handleSubtaskComplete = useCallback(async (subtask) => {
     if (!subtask.id) return
-    
+
     try {
-      await onUpdateTask(subtask.id, { 
-        status: subtask.status === 'done' ? 'todo' : 'done' 
+      await onUpdateTask(subtask.id, {
+        status: subtask.status === 'done' ? 'todo' : 'done'
       })
       // Refresh the task
       const response = await fetch(`${API_BASE}/tasks/${task.id}`)
@@ -249,7 +249,7 @@ function TaskDetail({
 
   const handleDeleteSubtask = useCallback(async (subtask) => {
     if (!subtask.id) return
-    
+
     if (window.confirm(`Are you sure you want to delete "${subtask.name}"?`)) {
       try {
         await onDeleteTask(subtask.id)
@@ -268,33 +268,33 @@ function TaskDetail({
   const handleTagChange = useCallback((tagName) => {
     const currentTags = editData.tags || []
     if (currentTags.includes(tagName)) {
-      setEditData({ 
-        ...editData, 
-        tags: currentTags.filter(t => t !== tagName) 
+      setEditData({
+        ...editData,
+        tags: currentTags.filter(t => t !== tagName)
       })
     } else {
-      setEditData({ 
-        ...editData, 
-        tags: [...currentTags, tagName] 
+      setEditData({
+        ...editData,
+        tags: [...currentTags, tagName]
       })
     }
   }, [editData])
 
   const handleAddTag = useCallback(() => {
     if (!newTagName.trim()) return
-    
+
     const normalizedTag = newTagName.trim().toLowerCase()
     const currentTags = editData.tags || []
-    
+
     // Don't add if already exists (case-insensitive check)
     const exists = currentTags.some(t => t.toLowerCase() === normalizedTag)
     if (!exists) {
-      setEditData({ 
-        ...editData, 
-        tags: [...currentTags, normalizedTag] 
+      setEditData({
+        ...editData,
+        tags: [...currentTags, normalizedTag]
       })
     }
-    
+
     setNewTagName('')
   }, [editData, newTagName])
 
@@ -326,7 +326,7 @@ function TaskDetail({
             <h1 className={priorityClass(task.priority)}>{task.name}</h1>
           )}
         </div>
-        
+
         <div className="task-detail-actions">
           {editing ? (
             <>
@@ -417,9 +417,9 @@ function TaskDetail({
               <input
                 type="datetime-local"
                 value={editData.due_date ? new Date(editData.due_date).toISOString().slice(0, 16) : ''}
-                onChange={(e) => setEditData({ 
-                  ...editData, 
-                  due_date: e.target.value ? new Date(e.target.value).toISOString() : null 
+                onChange={(e) => setEditData({
+                  ...editData,
+                  due_date: e.target.value ? new Date(e.target.value).toISOString() : null
                 })}
               />
             ) : (
@@ -470,9 +470,9 @@ function TaskDetail({
                 task.tags.map(tag => {
                   const tagObj = tags.find(t => t.name === tag)
                   return (
-                    <span 
-                      key={tag} 
-                      className="tag-chip" 
+                    <span
+                      key={tag}
+                      className="tag-chip"
                       style={{ backgroundColor: tagObj?.color || '#ccc' }}
                     >
                       {tag}
@@ -488,7 +488,7 @@ function TaskDetail({
 
         <div className="task-detail-section">
           <h2>Subtasks ({(task.subtasks || []).filter(s => s.status === 'done').length}/{(task.subtasks || []).length})</h2>
-          
+
           {task.subtasks && task.subtasks.length > 0 && (
             <div className="subtasks-list">
               {task.subtasks.map(subtask => (
@@ -509,7 +509,7 @@ function TaskDetail({
                       </span>
                     )}
                   </div>
-                  <button 
+                  <button
                     onClick={() => handleDeleteSubtask(subtask)}
                     className="delete-subtask"
                   >
@@ -542,7 +542,7 @@ function TaskDetail({
                 {task.recurrence.interval} (every {task.recurrence.interval_count})
               </span>
               <p>
-                {task.recurrence.interval_count === 1 
+                {task.recurrence.interval_count === 1
                   ? `This task repeats ${task.recurrence.interval}.`
                   : `This task repeats every ${task.recurrence.interval_count} ${task.recurrence.interval}s.`}
               </p>
