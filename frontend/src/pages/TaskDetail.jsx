@@ -455,10 +455,10 @@ function TaskDetail({
           )}
         </div>
 
-        {(task.subtasks && task.subtasks.length > 0) && (
-          <div className="task-detail-section">
-            <h2>Subtasks ({task.subtasks.filter(s => s.status === 'done').length}/{task.subtasks.length})</h2>
-            
+        <div className="task-detail-section">
+          <h2>Subtasks ({(task.subtasks || []).filter(s => s.status === 'done').length}/{(task.subtasks || []).length})</h2>
+          
+          {task.subtasks && task.subtasks.length > 0 && (
             <div className="subtasks-list">
               {task.subtasks.map(subtask => (
                 <div key={subtask.id} className={`subtask-item ${subtask.status === 'done' ? 'done' : ''}`}>
@@ -487,21 +487,21 @@ function TaskDetail({
                 </div>
               ))}
             </div>
+          )}
 
-            <div className="add-subtask">
-              <input
-                type="text"
-                placeholder="Add subtask..."
-                value={newSubtask}
-                onChange={(e) => setNewSubtask(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && handleAddSubtask()}
-              />
-              <button onClick={handleAddSubtask} disabled={!newSubtask.trim() || loading}>
-                Add
-              </button>
-            </div>
+          <div className="add-subtask">
+            <input
+              type="text"
+              placeholder="Add subtask..."
+              value={newSubtask}
+              onChange={(e) => setNewSubtask(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && handleAddSubtask()}
+            />
+            <button onClick={handleAddSubtask} disabled={!newSubtask.trim() || loading}>
+              Add
+            </button>
           </div>
-        )}
+        </div>
 
         {task.recurrence && (
           <div className="task-detail-section">
