@@ -104,6 +104,7 @@ function TaskDetail({
   const [editing, setEditing] = useState(false)
   const [editData, setEditData] = useState({})
   const [newSubtask, setNewSubtask] = useState('')
+  const [newTagName, setNewTagName] = useState('')
   const [loading, setLoading] = useState(false)
 
   const API_BASE = '/api/v1'
@@ -279,6 +280,24 @@ function TaskDetail({
     }
   }, [editData])
 
+  const handleAddTag = useCallback(() => {
+    if (!newTagName.trim()) return
+    
+    const normalizedTag = newTagName.trim().toLowerCase()
+    const currentTags = editData.tags || []
+    
+    // Don't add if already exists (case-insensitive check)
+    const exists = currentTags.some(t => t.toLowerCase() === normalizedTag)
+    if (!exists) {
+      setEditData({ 
+        ...editData, 
+        tags: [...currentTags, normalizedTag] 
+      })
+    }
+    
+    setNewTagName('')
+  }, [editData, newTagName])
+
   if (!task) {
     return (
       <div className="task-detail loading">
@@ -432,6 +451,18 @@ function TaskDetail({
                   </span>
                 </label>
               ))}
+              <div className="add-tag">
+                <input
+                  type="text"
+                  placeholder="Add new tag..."
+                  value={newTagName}
+                  onChange={(e) => setNewTagName(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && handleAddTag()}
+                />
+                <button onClick={handleAddTag} disabled={!newTagName.trim() || loading}>
+                  Add
+                </button>
+              </div>
             </div>
           ) : (
             <div className="task-tags">

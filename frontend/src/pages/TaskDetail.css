@@ -380,6 +380,36 @@
   cursor: not-allowed;
 }
 
+.add-tag {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.add-tag input {
+  flex: 1;
+  padding: 8px 12px;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
+  font-size: 0.9rem;
+}
+
+.add-tag button {
+  padding: 8px 16px;
+  background: var(--accent-blue);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.add-tag button:disabled {
+  background: rgba(25, 118, 210, 0.4);
+  cursor: not-allowed;
+}
+
 .delete-subtask {
   background: none;
   border: none;
