@@ -12,6 +12,13 @@ A lightweight, self-hosted task management application with REST API and web GUI
 - **Sorting**: Sort by created, updated, due date, priority, or name
 - **Web GUI**: Responsive React frontend served from the same container
 - **API**: Full REST API with OpenAPI documentation at `/docs`
+- **Theme Support**: Light and dark themes with system preference detection
+
+## GUI Features
+
+### Theme Toggle
+
+The GUI supports light and dark themes. Click the theme toggle button (🌙/☀️) in the top-right corner to switch between themes. Your preference is saved to localStorage and will persist across sessions. On first visit, the app automatically detects your system's color scheme preference.
 
 ## Quick Start
 
@@ -160,21 +167,29 @@ Environment variables:
 taskd/
 ├── backend/           # FastAPI backend
 │   └── app/           # Python application
+│       ├── __init__.py
 │       ├── main.py    # FastAPI app
 │       ├── database.py
 │       ├── models.py
 │       ├── schemas.py
 │       ├── routers/
+│       │   ├── __init__.py
 │       │   ├── tasks.py
 │       │   └── tags.py
-│       └── services/
-│           ├── task_service.py
-│           └── tag_service.py
+│       ├── services/
+│       │   ├── __init__.py
+│       │   ├── task_service.py
+│       │   └── tag_service.py
+│       └── utils/
+│           ├── __init__.py
+│           └── recurrence.py
 ├── frontend/          # React frontend
+│   ├── public/        # Static assets
+│   │   └── favicon.svg
 │   └── src/           # React source
 ├── Dockerfile         # Multi-stage build
 ├── docker-compose.yml
-└── static/           # Built React files (created during build)
+└── README.md          # This file
 ```
 
 ## Development
