@@ -19,7 +19,7 @@
   --shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   --radius: 8px;
   --padding: 16px;
-  
+
   /* Header */
   --header-bg: var(--bg-secondary);
   --header-text: var(--accent-blue);
@@ -39,7 +39,7 @@
   --accent-yellow: #ffd54f;
   --border-color: #404040;
   --shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-  
+
   /* Header */
   --header-bg: var(--bg-secondary);
   --header-text: #8ab4f8;

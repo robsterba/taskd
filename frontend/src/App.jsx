@@ -18,7 +18,7 @@ function App() {
     // Check localStorage first, then system preference
     const savedTheme = localStorage.getItem('theme')
     if (savedTheme) return savedTheme
-    
+
     // Check system preference for dark mode
     if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
       return 'dark'
@@ -171,8 +171,8 @@ function App() {
       <header className="app-header">
         <h1 onClick={() => navigate('/')}>taskd</h1>
         <div className="header-actions">
-          <button 
-            className="theme-toggle" 
+          <button
+            className="theme-toggle"
             onClick={toggleTheme}
             aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
           >
@@ -183,7 +183,7 @@ function App() {
         </div>
         {error && <div className="error-banner">{error}</div>}
       </header>
-      
+
       <main className="app-main">
         <Routes>
           <Route
