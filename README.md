@@ -194,6 +194,30 @@ Environment variables:
 - `PORT` - HTTP port (default: 8000)
 - `DATA_DIR` - Database directory (default: /data)
 
+## Versioning
+
+taskd uses a **major.minor** versioning scheme. The version is stored in the `VERSION` file at the project root and is automatically displayed in the GUI header and available via the API.
+
+### Current Version
+The current version is displayed in the top-right of the GUI (e.g., `v1.0.0`).
+
+### API Endpoints
+- `GET /api/v1/version` - Returns `{"version": "X.Y.Z"}`
+- `GET /api/v1/health` - Includes version in the response
+
+### Updating the Version
+To update the version (e.g., for a release):
+
+1. Edit the `VERSION` file at the project root
+2. Update the version number (e.g., from `1.0.0` to `1.1.0`)
+3. Commit the change
+
+The version will automatically be picked up by both the backend and frontend.
+
+**Version Format:** `MAJOR.MINOR`
+- **MAJOR**: Incremented for breaking changes or significant new features
+- **MINOR**: Incremented for backwards-compatible new features or improvements
+
 ## Architecture
 
 - **Backend**: FastAPI (Python)
