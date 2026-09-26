@@ -148,7 +148,7 @@ function TaskList({
   const navigate = useNavigate()
   const [quickAdd, setQuickAdd] = useState('')
   const [filters, setFilters] = useState({
-    status: [],
+    status: ['todo', 'in_progress'],
     priority: [],
     tag: [],
     parent: 'none',
@@ -404,7 +404,7 @@ function TaskList({
 
           <button
             onClick={() => setFilters({
-              status: [],
+              status: ['todo', 'in_progress'],
               priority: [],
               tag: [],
               parent: 'none',
