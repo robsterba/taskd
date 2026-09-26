@@ -15,7 +15,7 @@ from ..services.task_service import (
 )
 from ..services.tag_service import get_or_create_tags
 from ..models import Task
-from ..version import VERSION
+from ..version import VERSION, get_version as read_version
 
 router = APIRouter(prefix="/api/v1", tags=["tasks"])
 
@@ -25,7 +25,7 @@ def health_check():
     """Health check endpoint."""
     return HealthResponse(
         status="ok",
-        version=VERSION,
+        version=read_version(),
         timestamp=datetime.now(timezone.utc)
     )
 
@@ -33,7 +33,7 @@ def health_check():
 @router.get("/version")
 def get_version():
     """Get the application version."""
-    return {"version": VERSION}
+    return {"version": read_version()}
 
 
 @router.get("/tasks", response_model=TaskListResponse)

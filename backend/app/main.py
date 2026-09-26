@@ -9,13 +9,13 @@ from pathlib import Path
 from .database import init_db
 from .routers.tasks import router as tasks_router
 from .routers.tags import router as tags_router
-from .version import VERSION
+from .version import VERSION, get_version
 
 # Create FastAPI app
 app = FastAPI(
     title="taskd",
     description="A lightweight, self-hosted task management application with REST API and web GUI",
-    version=VERSION,
+    version=get_version(),
     docs_url="/docs",
     redoc_url="/redoc",
     openapi_url="/api/v1/openapi.json"
