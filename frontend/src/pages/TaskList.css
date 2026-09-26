@@ -69,9 +69,6 @@
   color: var(--text-secondary);
 }
 
-.filter-group select,
-.filter-group input {
-
 /* Checkbox group for multi-select filters */
 .checkbox-group {
   display: flex;
