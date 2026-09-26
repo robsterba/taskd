@@ -463,7 +463,8 @@
 }
 
 .meta-item span {
-  font-weight: 500;
+  font-size: 0.85rem;
+  font-weight: normal;
   color: var(--text-primary);
 }
 
