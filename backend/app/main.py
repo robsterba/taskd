@@ -9,12 +9,13 @@ from pathlib import Path
 from .database import init_db
 from .routers.tasks import router as tasks_router
 from .routers.tags import router as tags_router
+from .version import VERSION
 
 # Create FastAPI app
 app = FastAPI(
     title="taskd",
     description="A lightweight, self-hosted task management application with REST API and web GUI",
-    version="1.0.0",
+    version=VERSION,
     docs_url="/docs",
     redoc_url="/redoc",
     openapi_url="/api/v1/openapi.json"
@@ -67,12 +68,12 @@ async def serve_spa(request: Request):
     path = request.url.path
     if path.startswith("/api") or path.startswith("/docs") or path.startswith("/redoc") or path.startswith("/openapi") or path.startswith("/static"):
         raise HTTPException(status_code=404, detail="Not found")
-    
+
     # Serve index.html for SPA routing
     index_path = STATIC_DIR / "index.html"
     if index_path.exists():
         return HTMLResponse(index_path.read_text())
-    
+
     # For development, return a simple message
     return {"message": "taskd API is running. Frontend not built yet."}
 

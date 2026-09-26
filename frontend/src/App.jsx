@@ -25,6 +25,7 @@ function App() {
     }
     return 'light'
   })
+  const [appVersion, setAppVersion] = useState('')
   const navigate = useNavigate()
 
   const API_BASE = '/api/v1'
@@ -35,6 +36,14 @@ function App() {
     root.setAttribute('data-theme', theme)
     localStorage.setItem('theme', theme)
   }, [theme])
+
+  // Fetch app version on mount
+  useEffect(() => {
+    fetch(`${API_BASE}/version`)
+      .then(res => res.json())
+      .then(data => setAppVersion(data.version || ''))
+      .catch(() => setAppVersion(''))
+  }, [API_BASE])
 
   const toggleTheme = () => {
     setTheme(prev => prev === 'light' ? 'dark' : 'light')
@@ -169,7 +178,10 @@ function App() {
   return (
     <div className="app">
       <header className="app-header">
-        <h1 onClick={() => navigate('/')}>taskd</h1>
+        <div className="header-left">
+          <h1 onClick={() => navigate('/')}>taskd</h1>
+          {appVersion && <span className="version-badge">v{appVersion}</span>}
+        </div>
         <div className="header-actions">
           <button
             className="theme-toggle"

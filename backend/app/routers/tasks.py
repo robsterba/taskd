@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 
 from ..database import get_db
 from ..schemas import (
-    TaskCreate, TaskUpdate, TaskResponse, TaskDetailResponse, 
+    TaskCreate, TaskUpdate, TaskResponse, TaskDetailResponse,
     TaskListResponse, TaskChangeResponse, HealthResponse
 )
 from ..services.task_service import (
@@ -15,6 +15,7 @@ from ..services.task_service import (
 )
 from ..services.tag_service import get_or_create_tags
 from ..models import Task
+from ..version import VERSION
 
 router = APIRouter(prefix="/api/v1", tags=["tasks"])
 
@@ -24,9 +25,15 @@ def health_check():
     """Health check endpoint."""
     return HealthResponse(
         status="ok",
-        version="1.0.0",
+        version=VERSION,
         timestamp=datetime.now(timezone.utc)
     )
+
+
+@router.get("/version")
+def get_version():
+    """Get the application version."""
+    return {"version": VERSION}
 
 
 @router.get("/tasks", response_model=TaskListResponse)
@@ -57,7 +64,7 @@ def list_tasks_endpoint(
         limit=limit,
         offset=offset
     )
-    
+
     # Convert tasks to response format (extract tag names)
     task_responses = []
     for task in tasks:
@@ -76,7 +83,7 @@ def list_tasks_endpoint(
             created_at=task.created_at,
             updated_at=task.updated_at
         ))
-    
+
     return TaskListResponse(
         tasks=task_responses,
         total=total,
@@ -94,7 +101,7 @@ def create_task_endpoint(
     """Create a new task."""
     # Use source from header if provided, otherwise from body, otherwise default to "api"
     effective_source = source or task_data.source or "api"
-    
+
     try:
         task = create_task(db, task_data, source=effective_source)
         return TaskResponse(
@@ -124,9 +131,9 @@ def get_changed_tasks_endpoint(
     """Get tasks changed since a specific timestamp."""
     if not since.tzinfo:
         since = since.replace(tzinfo=timezone.utc)
-    
+
     tasks = get_changed_tasks(db, since)
-    
+
     # Convert tasks to response format (extract tag names)
     task_responses = []
     for task in tasks:
@@ -145,7 +152,7 @@ def get_changed_tasks_endpoint(
             created_at=task.created_at,
             updated_at=task.updated_at
         ))
-    
+
     return TaskChangeResponse(
         tasks=task_responses,
         since=since
@@ -158,7 +165,7 @@ def get_task_endpoint(task_id: str, db: Session = Depends(get_db)):
     task = get_task(db, task_id, include_subtasks=True)
     if not task:
         raise HTTPException(status_code=404, detail=f"Task with id {task_id} not found")
-    
+
     # Convert to detail response
     return get_task_detail_response(db, task)
 
@@ -169,7 +176,7 @@ def update_task_endpoint(task_id: str, update_data: TaskUpdate, db: Session = De
     task = update_task(db, task_id, update_data)
     if not task:
         raise HTTPException(status_code=404, detail=f"Task with id {task_id} not found")
-    
+
     return TaskResponse(
         id=task.id,
         name=task.name,
@@ -192,7 +199,7 @@ def complete_task_endpoint(task_id: str, db: Session = Depends(get_db)):
     task = complete_task(db, task_id)
     if not task:
         raise HTTPException(status_code=404, detail=f"Task with id {task_id} not found")
-    
+
     # Add warning header if parent task still has incomplete subtasks
     headers = {}
     if task.parent_task_id:
@@ -206,7 +213,7 @@ def complete_task_endpoint(task_id: str, db: Session = Depends(get_db)):
             ).count()
             if incomplete_subtasks > 0:
                 headers["X-Warning"] = "Parent task has incomplete subtasks"
-    
+
     return TaskResponse(
         id=task.id,
         name=task.name,
