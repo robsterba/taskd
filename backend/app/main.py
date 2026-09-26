@@ -81,7 +81,7 @@ async def serve_spa(request: Request, path: str):
         return HTMLResponse(index_path.read_text())
 
     # For development, return a simple message
-    return {"message": "taskd API is running. Frontend not built yet."
+    return {"message": "taskd API is running. Frontend not built yet."}
 
 
 if __name__ == "__main__":
