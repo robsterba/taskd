@@ -70,7 +70,7 @@ async def serve_spa(request: Request, path: str):
     
     # For static assets, try to serve the file directly
     if path.startswith("/static/"):
-        file_path = STATIC_DIR / path.lstrip("/")
+        file_path = STATIC_DIR / path.removeprefix("/static/")
         if file_path.exists():
             from fastapi.responses import FileResponse
             return FileResponse(file_path)
