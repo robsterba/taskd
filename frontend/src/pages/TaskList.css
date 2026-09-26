@@ -71,6 +71,41 @@
 
 .filter-group select,
 .filter-group input {
+
+/* Checkbox group for multi-select filters */
+.checkbox-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  max-height: 120px;
+  overflow-y: auto;
+}
+
+.filter-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  color: var(--text-primary);
+  padding: 4px 8px;
+}
+
+.filter-checkbox input {
+  margin: 0;
+}
+
+.filter-checkbox:hover {
+  background: var(--bg-tertiary);
+  border-radius: 4px;
+}
+
+.filter-checkbox input:checked + span {
+  font-weight: 500;
+}
+
+.filter-group select,
+.filter-group input {
   padding: 8px 12px;
   border: 1px solid var(--border-color);
   border-radius: 6px;
