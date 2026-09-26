@@ -66,7 +66,7 @@ async def serve_spa(request: Request):
     """Serve the React SPA for all non-API routes."""
     # Check if the path is for API, docs, or static files
     path = request.url.path
-    if path.startswith("/api") or path.startswith("/docs") or path.startswith("/redoc") or path.startswith("/openapi"):
+    if path.startswith("/api") or path.startswith("/docs") or path.startswith("/redoc") or path.startswith("/openapi") or path.startswith("/static"):
         raise HTTPException(status_code=404, detail="Not found")
 
     # Serve index.html for SPA routing
