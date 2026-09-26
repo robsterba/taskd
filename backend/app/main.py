@@ -62,20 +62,26 @@ async def serve_spa_root(request: Request):
 
 
 @app.get("/{path:path}")
-async def serve_spa(request: Request):
+async def serve_spa(request: Request, path: str):
     """Serve the React SPA for all non-API routes."""
-    # Check if the path is for API, docs, or static files
-    path = request.url.path
-    if path.startswith("/api") or path.startswith("/docs") or path.startswith("/redoc") or path.startswith("/openapi") or path.startswith("/static"):
+    # Check if the path is for API or docs
+    if path.startswith("/api") or path.startswith("/docs") or path.startswith("/redoc") or path.startswith("/openapi"):
         raise HTTPException(status_code=404, detail="Not found")
-
-    # Serve index.html for SPA routing
+    
+    # For static assets, try to serve the file directly
+    if path.startswith("/static/"):
+        file_path = STATIC_DIR / path.lstrip("/")
+        if file_path.exists():
+            from fastapi.responses import FileResponse
+            return FileResponse(file_path)
+    
+    # Serve index.html for all other non-API paths (SPA routing)
     index_path = STATIC_DIR / "index.html"
     if index_path.exists():
         return HTMLResponse(index_path.read_text())
 
     # For development, return a simple message
-    return {"message": "taskd API is running. Frontend not built yet."}
+    return {"message": "taskd API is running. Frontend not built yet."
 
 
 if __name__ == "__main__":
