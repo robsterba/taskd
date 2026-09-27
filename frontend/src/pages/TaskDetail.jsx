@@ -446,7 +446,7 @@ function TaskDetail({
                     checked={(editData.tags || []).includes(tag.name)}
                     onChange={() => handleTagChange(tag.name)}
                   />
-                  <span style={{ backgroundColor: tag.color || 'var(--bg-inset)' }}>
+                  <span style={{ backgroundColor: tag.color || 'var(--accent)' }}>
                     {tag.name}
                   </span>
                 </label>
@@ -473,7 +473,7 @@ function TaskDetail({
                     <span
                       key={tag}
                       className="tag-chip"
-                      style={{ backgroundColor: tagObj?.color || 'var(--bg-inset)' }}
+                      style={{ backgroundColor: tagObj?.color || 'var(--accent)' }}
                     >
                       {tag}
                     </span>

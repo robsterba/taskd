@@ -376,7 +376,7 @@ function TaskList({
                       setFilters({...filters, tag: newTags})
                     }}
                   />
-                  <span style={{ backgroundColor: tag.color || 'var(--bg-inset)' }}>
+                  <span style={{ backgroundColor: tag.color || 'var(--accent)' }}>
                     {tag.name}
                   </span>
                 </label>
