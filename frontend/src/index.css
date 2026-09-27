@@ -1,8 +1,18 @@
 /* ============================================================
    STANDARD WEB THEME SPEC — Rob Sterba
-   Single source of truth for color & style.
-   Set data-theme="light" or "dark" on <html>. All components
-   consume variables only — never hard-code hex values.
+   Apply to ALL web applications. Reference this file (or copy
+   its tokens) as the single source of truth for color & style.
+
+   Brand palette:
+     #E7ECEF  Platinum    — light page background / night text
+     #274C77  Dusk Blue   — dark surfaces / day primary accent
+     #6096BA  Steel Blue  — secondary accent, borders, hover
+     #A3CEF1  Icy Blue    — highlights, night accent fills
+     #8B8C89  Grey Olive  — muted text, subtle lines
+
+   Usage: import this stylesheet, set data-theme="light" or
+   "dark" on <html>. All components consume variables only —
+   never hard-code hex values.
    ============================================================ */
 
 /* ---------- LIGHT / DAY THEME (default) ---------- */
@@ -11,39 +21,43 @@
   color-scheme: light;
 
   /* Surfaces */
-  --bg-page:        #DBD8E3;
-  --bg-surface:     #FFFFFF;
-  --bg-surface-alt: #EFEDF5;
-  --bg-inset:       #C9C5D5;
+  --bg-page:        #E7ECEF;  /* platinum page background */
+  --bg-surface:     #FFFFFF;  /* cards, panels (near-neutral, derived) */
+  --bg-surface-alt: #F5F8FA;  /* subtle raised areas, inputs */
+  --bg-inset:       #D3DCE3;  /* wells, code blocks, pressed states */
 
   /* Text */
-  --text-primary:   #2A2539;
-  --text-secondary: #5E5373;
-  --text-disabled:  #A9A4B8;
-  --text-inverse:   #DBD8E3;
+  --text-primary:   #274C77;
+  --text-secondary: #8B8C89;
+  --text-disabled:  #B4B7B3;
+  --text-inverse:   #E7ECEF;  /* text on dark fills */
 
   /* Brand / accents */
-  --accent:         #353044;
-  --accent-hover:   #5E5373;
-  --accent-pressed: #2A2539;
-  --accent-border:  #5E5373;
-  --on-accent:      #DBD8E3;
+  --accent:         #274C77;  /* primary buttons, links, active nav */
+  --accent-hover:   #6096BA;
+  --accent-pressed: #1F3D5E;
+  --accent-border:  #6096BA;
+  --on-accent:      #E7ECEF;
+
+  /* Highlights */
+  --highlight:      #A3CEF1;  /* selected rows, info chips */
+  --highlight-soft: #D9EAF8;
 
   /* Lines & dividers */
-  --border-default: #5E5373;
-  --border-subtle:  #C0BCCC;
+  --border-default: #6096BA;
+  --border-subtle:  #C5CDD4;
 
-  /* Status (derived neutrals) */
+  /* Status (derived harmonized neutrals) */
   --success:        #4C6B57;
   --warning:        #8A6D3B;
   --danger:         #8C3A3A;
-  --info:           #4A5D7A;
+  --info:           #6096BA;
 
   /* Elevation & focus */
-  --shadow-sm: 0 1px 2px rgba(42, 37, 57, 0.15);
-  --shadow-md: 0 4px 12px rgba(42, 37, 57, 0.18);
-  --shadow-lg: 0 12px 32px rgba(42, 37, 57, 0.22);
-  --focus-ring: 0 0 0 3px rgba(94, 83, 115, 0.45);
+  --shadow-sm: 0 1px 2px rgba(39, 76, 119, 0.15);
+  --shadow-md: 0 4px 12px rgba(39, 76, 119, 0.18);
+  --shadow-lg: 0 12px 32px rgba(39, 76, 119, 0.22);
+  --focus-ring: 0 0 0 3px rgba(96, 150, 186, 0.50);
 }
 
 /* ---------- DARK / NIGHT THEME ---------- */
@@ -51,39 +65,43 @@
   color-scheme: dark;
 
   /* Surfaces */
-  --bg-page:        #2A2539;
-  --bg-surface:     #353044;
-  --bg-surface-alt: #3E3850;
-  --bg-inset:       #232030;
+  --bg-page:        #274C77;  /* dusk blue page background */
+  --bg-surface:     #2F587F;  /* cards, panels (derived raised tone) */
+  --bg-surface-alt: #37628C;  /* subtle raised areas, inputs */
+  --bg-inset:       #1F3A5C;  /* wells, code blocks, pressed states */
 
   /* Text */
-  --text-primary:   #DBD8E3;
-  --text-secondary: #B3AEC4;
-  --text-disabled:  #6B6480;
-  --text-inverse:   #2A2539;
+  --text-primary:   #E7ECEF;
+  --text-secondary: #A3CEF1;
+  --text-disabled:   #7E93AA;
+  --text-inverse:   #274C77;  /* text on light fills */
 
   /* Brand / accents (accent inverts: light fill, dark text) */
-  --accent:         #DBD8E3;
-  --accent-hover:   #EFEDF5;
-  --accent-pressed: #C9C5D5;
-  --accent-border:  #5E5373;
-  --on-accent:      #2A2539;
+  --accent:         #A3CEF1;
+  --accent-hover:   #C6E2F7;
+  --accent-pressed: #8FBDE4;
+  --accent-border:  #6096BA;
+  --on-accent:      #274C77;
+
+  /* Highlights */
+  --highlight:      #A3CEF1;
+  --highlight-soft: #3F6D97;
 
   /* Lines & dividers */
-  --border-default: #5E5373;
-  --border-subtle:  #4A4460;
+  --border-default: #6096BA;
+  --border-subtle:  #46688B;
 
   /* Status (brightened for dark backgrounds) */
   --success:        #7FA891;
   --warning:        #C9A56A;
   --danger:         #C97A7A;
-  --info:           #8FA5C4;
+  --info:           #A3CEF1;
 
   /* Elevation & focus */
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.35);
-  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.40);
-  --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.50);
-  --focus-ring: 0 0 0 3px rgba(219, 216, 227, 0.35);
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.30);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.35);
+  --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.45);
+  --focus-ring: 0 0 0 3px rgba(163, 206, 241, 0.40);
 }
 
 /* ============================================================
