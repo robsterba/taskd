@@ -473,7 +473,7 @@ function TaskDetail({
                   return (
                     <span
                       key={tag}
-                      className="tag-chip"
+                      className="detail-tag-chip"
                       style={tagChipStyle(tagObj?.color)}
                     >
                       {tag}
