@@ -65,3 +65,7 @@ frontend/dist/
 # OS
 .DS_Store
 Thumbs.db
+
+# Local documentation (kept out of the repo)
+/style.md
+/taskd-application-specification.md
