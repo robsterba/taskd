@@ -1,8 +1,17 @@
 /* ============================================================
    STANDARD WEB THEME SPEC — Rob Sterba
-   Single source of truth for color & style.
-   Set data-theme="light" or "dark" on <html>. All components
-   consume variables only — never hard-code hex values.
+   Apply to ALL web applications. Reference this file (or copy
+   its tokens) as the single source of truth for color & style.
+
+   Brand palette (from spec image):
+     #2A2539  Deep plum-charcoal  — primary dark / night background
+     #353044  Slate charcoal      — night surfaces / day primary
+     #5E5373  Muted violet-gray   — accents, hover, borders
+     #DBD8E3  Pale lavender       — night text / day background
+
+   Usage: import this stylesheet, set data-theme="light" or
+   "dark" on <html>. All components consume variables only —
+   never hard-code hex values.
    ============================================================ */
 
 /* ---------- LIGHT / DAY THEME (default) ---------- */
@@ -11,19 +20,19 @@
   color-scheme: light;
 
   /* Surfaces */
-  --bg-page:        #DBD8E3;
-  --bg-surface:     #FFFFFF;
-  --bg-surface-alt: #EFEDF5;
-  --bg-inset:       #C9C5D5;
+  --bg-page:        #DBD8E3;  /* pale lavender page background */
+  --bg-surface:     #FFFFFF;  /* cards, panels (near-neutral, derived) */
+  --bg-surface-alt: #EFEDF5;  /* subtle raised areas, inputs */
+  --bg-inset:       #C9C5D5;  /* wells, code blocks, pressed states */
 
   /* Text */
   --text-primary:   #2A2539;
   --text-secondary: #5E5373;
   --text-disabled:  #A9A4B8;
-  --text-inverse:   #DBD8E3;
+  --text-inverse:   #DBD8E3;  /* text on dark fills */
 
   /* Brand / accents */
-  --accent:         #353044;
+  --accent:         #353044;  /* primary buttons, links, active nav */
   --accent-hover:   #5E5373;
   --accent-pressed: #2A2539;
   --accent-border:  #5E5373;
@@ -33,7 +42,7 @@
   --border-default: #5E5373;
   --border-subtle:  #C0BCCC;
 
-  /* Status (derived neutrals) */
+  /* Status (derived neutrals — adjust to taste) */
   --success:        #4C6B57;
   --warning:        #8A6D3B;
   --danger:         #8C3A3A;
@@ -51,16 +60,16 @@
   color-scheme: dark;
 
   /* Surfaces */
-  --bg-page:        #2A2539;
-  --bg-surface:     #353044;
-  --bg-surface-alt: #3E3850;
-  --bg-inset:       #232030;
+  --bg-page:        #2A2539;  /* deep plum-charcoal page background */
+  --bg-surface:     #353044;  /* cards, panels */
+  --bg-surface-alt: #3E3850;  /* subtle raised areas, inputs */
+  --bg-inset:       #232030;  /* wells, code blocks, pressed states */
 
   /* Text */
   --text-primary:   #DBD8E3;
   --text-secondary: #B3AEC4;
   --text-disabled:  #6B6480;
-  --text-inverse:   #2A2539;
+  --text-inverse:   #2A2539;  /* text on light fills */
 
   /* Brand / accents (accent inverts: light fill, dark text) */
   --accent:         #DBD8E3;
@@ -87,7 +96,7 @@
 }
 
 /* ============================================================
-   BASE ELEMENT STYLES
+   BASE ELEMENT STYLES — apply everywhere
    ============================================================ */
 * { box-sizing: border-box; }
 
@@ -159,146 +168,16 @@ code { padding: 0.1rem 0.35rem; }
 pre { padding: 1rem; overflow-x: auto; }
 
 /* ============================================================
-   APP-SPECIFIC STYLES (consume spec tokens only)
+   THEME SWITCHING SNIPPET (copy into app JS)
+   ------------------------------------------------------------
+   // Respect saved preference, else OS preference:
+   const saved = localStorage.getItem("theme");
+   const prefersDark = matchMedia("(prefers-color-scheme: dark)").matches;
+   const theme = saved ?? (prefersDark ? "dark" : "light");
+   document.documentElement.dataset.theme = theme;
+   ------------------------------------------------------------
+   // Toggle helper:
+   const t = document.documentElement.dataset.theme === "dark" ? "light" : "dark";
+   document.documentElement.dataset.theme = t;
+   localStorage.setItem("theme", t);
    ============================================================ */
-.app {
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-}
-
-.app-header {
-  background: var(--bg-surface);
-  padding: 16px;
-  border-bottom: 1px solid var(--border-subtle);
-  box-shadow: var(--shadow-sm);
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.app-header h1 {
-  font-size: 1.5rem;
-  font-weight: 600;
-  color: var(--text-primary);
-  cursor: pointer;
-  margin: 0;
-}
-
-.app-header h1:hover {
-  color: var(--accent-hover);
-}
-
-.app-main {
-  flex: 1;
-  padding: 16px;
-  max-width: 1200px;
-  margin: 0 auto;
-  width: 100%;
-}
-
-.error-banner {
-  background-color: var(--danger);
-  color: var(--text-inverse);
-  padding: 10px;
-  border-radius: 8px;
-  margin-top: 10px;
-  font-size: 0.9rem;
-}
-
-/* Default button: secondary treatment per spec */
-button {
-  cursor: pointer;
-  background: transparent;
-  color: var(--text-primary);
-  border: 1px solid var(--border-default);
-  border-radius: 6px;
-  padding: 0.55rem 1.1rem;
-  font: inherit;
-  font-weight: 500;
-  transition: background-color 0.15s ease, transform 0.05s ease;
-}
-
-button:hover {
-  background: var(--bg-surface-alt);
-  color: var(--text-primary);
-}
-
-button:active {
-  transform: translateY(1px);
-}
-
-button:disabled {
-  cursor: not-allowed;
-  opacity: 0.5;
-}
-
-/* Priority colors */
-.priority-urgent { border-left: 4px solid var(--danger); }
-.priority-high { border-left: 4px solid color-mix(in srgb, var(--danger) 70%, var(--text-primary)); }
-.priority-medium { border-left: 4px solid var(--warning); }
-.priority-low { border-left: 4px solid var(--success); }
-
-/* Status colors */
-.status-todo { color: var(--text-primary); }
-.status-in_progress { color: var(--info); }
-.status-done { color: var(--success); text-decoration: line-through; }
-.status-archived { color: var(--text-secondary); }
-
-/* Theme toggle button */
-.theme-toggle {
-  background: transparent;
-  border: 1px solid var(--border-default);
-  padding: 6px 12px;
-  font-size: 1rem;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.theme-toggle:hover {
-  background-color: var(--bg-surface-alt);
-  border-color: var(--accent-border);
-}
-
-.theme-toggle-icon {
-  font-size: 1.1rem;
-}
-
-/* Animations */
-@keyframes slideIn {
-  from {
-    transform: translateY(-10px);
-    opacity: 0;
-  }
-  to {
-    transform: translateY(0);
-    opacity: 1;
-  }
-}
-
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
-/* Loading spinner */
-.loading {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 40px;
-  color: var(--text-secondary);
-}
-
-.spinner {
-  border: 3px solid var(--bg-surface-alt);
-  border-top: 3px solid var(--accent);
-  border-radius: 50%;
-  width: 30px;
-  height: 30px;
-  animation: spin 1s linear infinite;
-}

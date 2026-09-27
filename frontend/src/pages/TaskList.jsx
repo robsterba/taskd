@@ -376,7 +376,7 @@ function TaskList({
                       setFilters({...filters, tag: newTags})
                     }}
                   />
-                  <span style={{ backgroundColor: tag.color || '#ccc' }}>
+                  <span style={{ backgroundColor: tag.color || 'var(--bg-inset)' }}>
                     {tag.name}
                   </span>
                 </label>

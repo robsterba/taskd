@@ -11,7 +11,7 @@
 .not-found h1 {
   font-size: 6rem;
   font-weight: 700;
-  color: var(--accent-red);
+  color: var(--danger);
   margin: 0;
   line-height: 1;
 }
@@ -31,14 +31,15 @@
 
 .not-found .back-button {
   padding: 12px 24px;
-  background: var(--accent-blue);
-  color: white;
-  border: none;
-  border-radius: 8px;
+  background: var(--accent);
+  color: var(--on-accent);
+  border: 1px solid var(--accent-border);
+  border-radius: 6px;
   font-size: 1rem;
   cursor: pointer;
 }
 
 .not-found .back-button:hover {
-  opacity: 0.9;
+  background: var(--accent-hover);
+  color: var(--on-accent);
 }

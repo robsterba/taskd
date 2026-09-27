@@ -1,7 +1,6 @@
 /**
  * App-specific styles
- * Note: Most styles are in index.css with theme support
- * This file can be used for component-specific overrides
+ * Colors and effects come from the theme tokens in index.css.
  */
 
 /* Ensure app takes full height */
@@ -30,7 +29,7 @@
   font-size: 0.85rem;
   color: var(--text-secondary);
   padding: 4px 8px;
-  background: var(--bg-tertiary);
+  background: var(--bg-surface-alt);
   border-radius: 4px;
 }
 

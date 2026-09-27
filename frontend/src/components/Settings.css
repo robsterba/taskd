@@ -4,14 +4,14 @@
 
 .settings-toggle {
   background: transparent;
-  border: 1px solid var(--border-color);
+  border: 1px solid var(--border-default);
   padding: 6px 12px;
   font-size: 0.95rem;
 }
 
 .settings-toggle:hover {
-  background-color: var(--bg-tertiary);
-  border-color: var(--accent-blue);
+  background-color: var(--bg-surface-alt);
+  border-color: var(--accent-border);
 }
 
 .settings-panel {
@@ -19,11 +19,11 @@
   top: calc(100% + 8px);
   right: 0;
   width: 280px;
-  background: var(--bg-secondary);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  padding: var(--padding);
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  box-shadow: var(--shadow-md);
+  padding: 16px;
   z-index: 200;
   animation: slideIn 0.2s ease-out;
 }
@@ -43,14 +43,14 @@
 }
 
 .settings-close {
-  background: var(--bg-tertiary);
+  background: var(--bg-surface-alt);
   color: var(--text-secondary);
   padding: 4px 10px;
   font-size: 0.85rem;
 }
 
 .settings-close:hover {
-  background: var(--border-color);
+  background: var(--bg-inset);
 }
 
 .settings-group {

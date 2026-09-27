@@ -1,11 +1,11 @@
 .task-detail {
-  background: var(--bg-secondary);
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
   border-radius: 8px;
-  box-shadow: var(--shadow);
+  box-shadow: var(--shadow-md);
   overflow: hidden;
   max-width: 800px;
   margin: 0 auto;
-  border: 1px solid var(--border-color);
 }
 
 .task-detail-header {
@@ -13,22 +13,14 @@
   align-items: center;
   gap: 16px;
   padding: 20px 24px;
-  border-bottom: 1px solid var(--border-color);
-  background: var(--bg-tertiary);
+  border-bottom: 1px solid var(--border-subtle);
+  background: var(--bg-surface-alt);
   flex-wrap: wrap;
 }
 
 .back-button {
-  background: var(--bg-secondary);
-  border: 1px solid var(--border-color);
   padding: 8px 16px;
-  border-radius: 6px;
   font-size: 0.95rem;
-  color: var(--text-primary);
-}
-
-.back-button:hover {
-  background: var(--bg-tertiary);
 }
 
 .task-detail-title {
@@ -46,12 +38,8 @@
 .task-detail-title .edit-input {
   width: 100%;
   padding: 8px 12px;
-  border: 2px solid var(--border-color);
-  border-radius: 6px;
   font-size: 1.3rem;
   font-weight: 500;
-  background-color: var(--bg-secondary);
-  color: var(--text-primary);
 }
 
 .task-detail-actions {
@@ -62,39 +50,49 @@
 
 .task-detail-actions button {
   padding: 10px 16px;
-  border-radius: 6px;
   font-size: 0.95rem;
   font-weight: 500;
 }
 
 .edit-button {
-  background: rgba(25, 118, 210, 0.15);
-  color: var(--accent-blue);
-  border: 1px solid rgba(144, 202, 249, 0.3);
+  background: color-mix(in srgb, var(--info) 15%, transparent);
+  color: var(--info);
+  border: 1px solid color-mix(in srgb, var(--info) 40%, transparent);
 }
 
-.save-button {
-  background: var(--accent-green);
-  color: white;
-  border: 1px solid rgba(27, 94, 32, 0.3);
+.edit-button:hover {
+  background: color-mix(in srgb, var(--info) 25%, transparent);
+  color: var(--info);
+}
+
+.save-button,
+.complete-button {
+  background: var(--success);
+  color: var(--text-inverse);
+  border: 1px solid var(--success);
+}
+
+.save-button:hover,
+.complete-button:hover {
+  background: color-mix(in srgb, var(--success) 80%, var(--text-primary));
+  color: var(--text-inverse);
 }
 
 .cancel-button {
-  background: var(--bg-secondary);
+  background: transparent;
   color: var(--text-primary);
-  border: 1px solid var(--border-color);
-}
-
-.complete-button {
-  background: var(--accent-green);
-  color: white;
-  border: 1px solid rgba(27, 94, 32, 0.3);
+  border: 1px solid var(--border-default);
 }
 
 .delete-button {
-  background: var(--accent-red);
-  color: white;
-  border: 1px solid rgba(142, 0, 0, 0.3);
+  background: var(--danger);
+  color: var(--text-inverse);
+  border: 1px solid var(--danger);
+}
+
+.delete-button:hover {
+  background: color-mix(in srgb, var(--danger) 80%, var(--text-primary));
+  color: var(--text-inverse);
 }
 
 .task-detail-body {
@@ -111,7 +109,7 @@
   color: var(--text-primary);
   margin-bottom: 12px;
   padding-bottom: 8px;
-  border-bottom: 1px solid var(--border-color);
+  border-bottom: 1px solid var(--border-subtle);
 }
 
 .task-description {
@@ -148,7 +146,7 @@
 }
 
 .markdown a {
-  color: var(--accent-blue);
+  color: var(--accent);
   text-decoration: underline;
 }
 
@@ -157,7 +155,7 @@
   flex-wrap: wrap;
   gap: 20px;
   padding: 16px;
-  background: var(--bg-tertiary);
+  background: var(--bg-surface-alt);
   border-radius: 8px;
 }
 
@@ -176,11 +174,7 @@
 .meta-group select,
 .meta-group input[type="datetime-local"] {
   padding: 8px 12px;
-  border: 1px solid var(--border-color);
-  border-radius: 6px;
   font-size: 0.9rem;
-  background-color: var(--bg-secondary);
-  color: var(--text-primary);
 }
 
 .meta-group input[type="datetime-local"] {
@@ -195,23 +189,23 @@
 }
 
 .status-badge.todo {
-  background: rgba(25, 118, 210, 0.15);
-  color: var(--accent-blue);
+  background: color-mix(in srgb, var(--info) 15%, transparent);
+  color: var(--info);
 }
 
 .status-badge.in_progress {
-  background: rgba(46, 125, 50, 0.15);
-  color: var(--accent-green);
+  background: color-mix(in srgb, var(--info) 15%, transparent);
+  color: var(--info);
 }
 
 .status-badge.done {
-  background: rgba(46, 125, 50, 0.15);
-  color: #1b5e20;
+  background: color-mix(in srgb, var(--success) 15%, transparent);
+  color: var(--success);
   text-decoration: line-through;
 }
 
 .status-badge.archived {
-  background: var(--bg-tertiary);
+  background: var(--bg-surface-alt);
   color: var(--text-secondary);
 }
 
@@ -223,36 +217,36 @@
 }
 
 .priority-badge.low {
-  background: rgba(90, 138, 63, 0.2);
-  color: var(--accent-green);
+  background: color-mix(in srgb, var(--success) 18%, transparent);
+  color: var(--success);
 }
 
 .priority-badge.medium {
-  background: rgba(180, 136, 23, 0.2);
-  color: var(--accent-yellow);
+  background: color-mix(in srgb, var(--warning) 18%, transparent);
+  color: var(--warning);
 }
 
 .priority-badge.high {
-  background: rgba(184, 84, 80, 0.2);
-  color: #b85450;
+  background: color-mix(in srgb, var(--danger) 18%, transparent);
+  color: color-mix(in srgb, var(--danger) 75%, var(--text-primary));
 }
 
 .priority-badge.urgent {
-  background: rgba(158, 42, 35, 0.2);
-  color: var(--accent-red);
+  background: color-mix(in srgb, var(--danger) 22%, transparent);
+  color: var(--danger);
 }
 
 .due-date {
   padding: 6px 12px;
-  background: rgba(25, 118, 210, 0.15);
+  background: color-mix(in srgb, var(--info) 15%, transparent);
   border-radius: 16px;
   font-size: 0.85rem;
-  color: var(--accent-blue);
+  color: var(--info);
 }
 
 .due-date.overdue {
-  background: rgba(201, 42, 42, 0.15);
-  color: var(--accent-red);
+  background: color-mix(in srgb, var(--danger) 18%, transparent);
+  color: var(--danger);
 }
 
 .task-tags {
@@ -309,7 +303,7 @@
   align-items: center;
   gap: 12px;
   padding: 12px;
-  background: var(--bg-tertiary);
+  background: var(--bg-surface-alt);
   border-radius: 8px;
 }
 
@@ -346,10 +340,10 @@
   font-weight: 500;
 }
 
-.subtask-priority.low { background: rgba(90, 138, 63, 0.2); color: var(--accent-green); }
-.subtask-priority.medium { background: rgba(180, 136, 23, 0.2); color: var(--accent-yellow); }
-.subtask-priority.high { background: rgba(184, 84, 80, 0.2); color: #b85450; }
-.subtask-priority.urgent { background: rgba(158, 42, 35, 0.2); color: var(--accent-red); }
+.subtask-priority.low { background: color-mix(in srgb, var(--success) 18%, transparent); color: var(--success); }
+.subtask-priority.medium { background: color-mix(in srgb, var(--warning) 18%, transparent); color: var(--warning); }
+.subtask-priority.high { background: color-mix(in srgb, var(--danger) 18%, transparent); color: color-mix(in srgb, var(--danger) 75%, var(--text-primary)); }
+.subtask-priority.urgent { background: color-mix(in srgb, var(--danger) 22%, transparent); color: var(--danger); }
 
 .add-subtask {
   display: flex;
@@ -360,23 +354,23 @@
 .add-subtask input {
   flex: 1;
   padding: 10px 12px;
-  border: 1px solid var(--border-color);
-  border-radius: 6px;
-  background-color: var(--bg-secondary);
-  color: var(--text-primary);
 }
 
 .add-subtask button {
   padding: 10px 16px;
-  background: var(--accent-green);
-  color: white;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
+  background: var(--success);
+  color: var(--text-inverse);
+  border: 1px solid var(--success);
+}
+
+.add-subtask button:hover {
+  background: color-mix(in srgb, var(--success) 80%, var(--text-primary));
+  color: var(--text-inverse);
 }
 
 .add-subtask button:disabled {
-  background: #a5d6a7;
+  background: color-mix(in srgb, var(--success) 40%, transparent);
+  border-color: transparent;
   cursor: not-allowed;
 }
 
@@ -389,31 +383,31 @@
 .add-tag input {
   flex: 1;
   padding: 8px 12px;
-  border: 1px solid var(--border-color);
-  border-radius: 6px;
-  background-color: var(--bg-secondary);
-  color: var(--text-primary);
   font-size: 0.9rem;
 }
 
 .add-tag button {
   padding: 8px 16px;
-  background: var(--accent-blue);
-  color: white;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
+  background: var(--accent);
+  color: var(--on-accent);
+  border: 1px solid var(--accent-border);
+}
+
+.add-tag button:hover {
+  background: var(--accent-hover);
+  color: var(--on-accent);
 }
 
 .add-tag button:disabled {
-  background: rgba(25, 118, 210, 0.4);
+  background: color-mix(in srgb, var(--accent) 40%, transparent);
+  border-color: transparent;
   cursor: not-allowed;
 }
 
 .delete-subtask {
   background: none;
   border: none;
-  color: var(--accent-red);
+  color: var(--danger);
   padding: 4px 8px;
   border-radius: 4px;
   cursor: pointer;
@@ -422,20 +416,20 @@
 }
 
 .delete-subtask:hover {
-  background: rgba(201, 42, 42, 0.15);
+  background: color-mix(in srgb, var(--danger) 18%, transparent);
 }
 
 .recurrence-info {
   padding: 16px;
-  background: rgba(25, 118, 210, 0.15);
+  background: color-mix(in srgb, var(--info) 15%, transparent);
   border-radius: 8px;
 }
 
 .recurrence-badge {
   display: inline-block;
   padding: 6px 12px;
-  background: var(--accent-blue);
-  color: white;
+  background: var(--info);
+  color: var(--text-inverse);
   border-radius: 16px;
   font-size: 0.85rem;
   font-weight: 500;
@@ -453,7 +447,7 @@
   justify-content: space-between;
   align-items: center;
   padding: 10px 16px;
-  background: var(--bg-tertiary);
+  background: var(--bg-surface-alt);
   border-radius: 8px;
 }
 
@@ -469,7 +463,7 @@
 }
 
 .task-id {
-  font-family: monospace;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
   font-size: 0.8rem;
   color: var(--text-secondary);
   word-break: break-all;
@@ -479,17 +473,7 @@
   width: 100%;
   min-height: 100px;
   padding: 12px;
-  border: 2px solid var(--border-color);
-  border-radius: 8px;
   font-family: inherit;
   font-size: 0.95rem;
   resize: vertical;
-  background-color: var(--bg-secondary);
-  color: var(--text-primary);
-}
-
-.edit-textarea:focus {
-  outline: none;
-  border-color: var(--accent-blue);
-  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
 }

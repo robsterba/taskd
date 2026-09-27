@@ -17,15 +17,6 @@
   min-width: 250px;
   padding: 12px 16px;
   font-size: 1rem;
-  border: 2px solid var(--border-color);
-  border-radius: 8px;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
-}
-
-.quick-add-input:focus {
-  outline: none;
-  border-color: var(--accent-blue);
-  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
 }
 
 .task-list-controls {
@@ -35,14 +26,7 @@
 
 .task-list-controls button {
   padding: 10px 16px;
-  border: 1px solid var(--border-color);
-  background: var(--bg-secondary);
-  color: var(--text-primary);
-  border-radius: 6px;
-}
-
-.task-list-controls button:hover {
-  background: var(--bg-tertiary);
+  font-size: 0.95rem;
 }
 
 .filters-panel {
@@ -50,9 +34,10 @@
   flex-wrap: wrap;
   gap: 16px;
   padding: 16px;
-  background: var(--bg-secondary);
-  border: 1px solid var(--border-color);
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
   border-radius: 8px;
+  box-shadow: var(--shadow-sm);
   margin-bottom: 20px;
 }
 
@@ -93,22 +78,12 @@
 }
 
 .filter-checkbox:hover {
-  background: var(--bg-tertiary);
+  background: var(--bg-surface-alt);
   border-radius: 4px;
 }
 
 .filter-checkbox input:checked + span {
   font-weight: 500;
-}
-
-.filter-group select,
-.filter-group input {
-  padding: 8px 12px;
-  border: 1px solid var(--border-color);
-  border-radius: 6px;
-  font-size: 0.95rem;
-  background-color: var(--bg-secondary);
-  color: var(--text-primary);
 }
 
 .search-group input {
@@ -118,12 +93,11 @@
 .clear-filters {
   align-self: flex-end;
   padding: 8px 16px;
-  background: var(--bg-tertiary);
   color: var(--text-secondary);
 }
 
 .clear-filters:hover {
-  background: var(--border-color);
+  background: var(--bg-inset);
 }
 
 .empty-state {
@@ -140,19 +114,20 @@
 }
 
 .task-card {
-  background: var(--bg-secondary);
-  border: 1px solid var(--border-color);
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
   border-radius: 8px;
   padding: 16px;
+  box-shadow: var(--shadow-sm);
   cursor: pointer;
   transition: box-shadow 0.2s ease, transform 0.2s ease, border-color 0.2s ease;
   color: var(--text-primary);
 }
 
 .task-card:hover {
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  box-shadow: var(--shadow-md);
   transform: translateY(-2px);
-  border-color: var(--accent-blue);
+  border-color: var(--accent-border);
 }
 
 .task-header {
@@ -193,7 +168,7 @@
 }
 
 .subtask-count {
-  background: var(--bg-tertiary);
+  background: var(--bg-surface-alt);
   padding: 2px 8px;
   border-radius: 12px;
   font-size: 0.8rem;
@@ -203,7 +178,7 @@
 .task-description {
   margin: 12px 0;
   padding: 12px;
-  background: var(--bg-tertiary);
+  background: var(--bg-inset);
   border-radius: 6px;
   font-size: 0.95rem;
   color: var(--text-primary);
@@ -234,35 +209,35 @@
 }
 
 .priority-badge.low {
-  background: rgba(90, 138, 63, 0.2);
-  color: var(--accent-green);
+  background: color-mix(in srgb, var(--success) 18%, transparent);
+  color: var(--success);
 }
 
 .priority-badge.medium {
-  background: rgba(180, 136, 23, 0.2);
-  color: var(--accent-yellow);
+  background: color-mix(in srgb, var(--warning) 18%, transparent);
+  color: var(--warning);
 }
 
 .priority-badge.high {
-  background: rgba(184, 84, 80, 0.2);
-  color: #e74c3c;
+  background: color-mix(in srgb, var(--danger) 18%, transparent);
+  color: color-mix(in srgb, var(--danger) 75%, var(--text-primary));
 }
 
 .priority-badge.urgent {
-  background: rgba(158, 42, 35, 0.2);
-  color: var(--accent-red);
+  background: color-mix(in srgb, var(--danger) 22%, transparent);
+  color: var(--danger);
 }
 
 .due-date {
   color: var(--text-secondary);
   padding: 4px 10px;
-  background: var(--bg-tertiary);
+  background: var(--bg-surface-alt);
   border-radius: 12px;
 }
 
 .due-date.overdue {
-  background: rgba(201, 42, 42, 0.15);
-  color: var(--accent-red);
+  background: color-mix(in srgb, var(--danger) 18%, transparent);
+  color: var(--danger);
   font-weight: 500;
 }
 
@@ -273,7 +248,7 @@
 }
 
 .tag-chip {
-  background: var(--bg-tertiary);
+  background: var(--bg-surface-alt);
   color: var(--text-primary);
   padding: 4px 10px;
   border-radius: 12px;
@@ -283,14 +258,14 @@
 }
 
 .tag-chip:hover {
-  background: var(--accent-blue);
-  color: white;
+  background: var(--accent);
+  color: var(--on-accent);
 }
 
 .subtasks-preview {
   margin-top: 12px;
   padding-top: 12px;
-  border-top: 1px dashed var(--border-color);
+  border-top: 1px dashed var(--border-subtle);
 }
 
 .subtask-item {
@@ -298,7 +273,7 @@
   align-items: center;
   gap: 10px;
   padding: 6px 12px;
-  background: var(--bg-tertiary);
+  background: var(--bg-surface-alt);
   border-radius: 6px;
   margin-bottom: 4px;
   font-size: 0.9rem;
@@ -325,5 +300,5 @@
   padding: 16px;
   color: var(--text-secondary);
   font-size: 0.9rem;
-  border-top: 1px solid var(--border-color);
+  border-top: 1px solid var(--border-subtle);
 }
