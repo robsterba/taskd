@@ -214,6 +214,19 @@ To update the version (e.g., for a release):
 
 The version will automatically be picked up by both the backend and frontend.
 
+### Releases
+
+`VERSION` is the single source of truth. To cut a release:
+
+1. Bump `VERSION` at the project root.
+2. Commit and push to `main`.
+3. Tag and push the tag: `git tag v1.3.5 && git push origin v1.3.5`.
+
+CI runs the backend test suite on every push, verifies the tag matches
+`VERSION`, builds the Docker image, pushes it to
+`ghcr.io/robsterba/taskd` (tagged `X.Y.Z` and `latest`), and publishes
+a GitHub Release with generated notes.
+
 **Version Format:** `MAJOR.MINOR`
 - **MAJOR**: Incremented for breaking changes or significant new features
 - **MINOR**: Incremented for backwards-compatible new features or improvements
