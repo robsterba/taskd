@@ -34,6 +34,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # Copy backend files
 COPY backend/ .
 
+# Copy version file (read by app/version.py, served at /api/v1/version)
+COPY VERSION ./VERSION
+
 # Install Python dependencies
 COPY backend/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
