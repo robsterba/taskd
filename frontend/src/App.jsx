@@ -3,17 +3,29 @@ import { Routes, Route, useNavigate } from 'react-router-dom'
 import TaskList from './pages/TaskList'
 import TaskDetail from './pages/TaskDetail'
 import NotFound from './pages/NotFound'
+import Settings from './components/Settings'
 import './App.css'
 import './index.css'
 import './pages/TaskList.css'
 import './pages/TaskDetail.css'
 import './pages/NotFound.css'
 
+const SETTINGS_STORAGE_KEY = 'taskd:settings'
+const DEFAULT_SETTINGS = { refreshInterval: 30 }
+
 function App() {
   const [tasks, setTasks] = useState([])
   const [tags, setTags] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+  const [settings, setSettings] = useState(() => {
+    try {
+      const saved = JSON.parse(localStorage.getItem(SETTINGS_STORAGE_KEY))
+      return saved ? { ...DEFAULT_SETTINGS, ...saved } : DEFAULT_SETTINGS
+    } catch {
+      return DEFAULT_SETTINGS
+    }
+  })
   const [theme, setTheme] = useState(() => {
     // Check localStorage first, then system preference
     const savedTheme = localStorage.getItem('theme')
@@ -36,6 +48,11 @@ function App() {
     root.setAttribute('data-theme', theme)
     localStorage.setItem('theme', theme)
   }, [theme])
+
+  // Persist settings on change
+  useEffect(() => {
+    localStorage.setItem(SETTINGS_STORAGE_KEY, JSON.stringify(settings))
+  }, [settings])
 
   // Fetch app version on mount
   useEffect(() => {
@@ -183,6 +200,7 @@ function App() {
           {appVersion && <span className="version-badge">v{appVersion}</span>}
         </div>
         <div className="header-actions">
+          <Settings settings={settings} onChange={setSettings} />
           <button
             className="theme-toggle"
             onClick={toggleTheme}
@@ -211,6 +229,7 @@ function App() {
                 onCompleteTask={completeTask}
                 onRefresh={fetchTasks}
                 onViewTask={(task) => navigate(`/tasks/${task.id}`)}
+                refreshInterval={settings.refreshInterval}
               />
             }
           />

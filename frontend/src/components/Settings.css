@@ -1,0 +1,77 @@
+.settings {
+  position: relative;
+}
+
+.settings-toggle {
+  background: transparent;
+  border: 1px solid var(--border-color);
+  padding: 6px 12px;
+  font-size: 0.95rem;
+}
+
+.settings-toggle:hover {
+  background-color: var(--bg-tertiary);
+  border-color: var(--accent-blue);
+}
+
+.settings-panel {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  width: 280px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  padding: var(--padding);
+  z-index: 200;
+  animation: slideIn 0.2s ease-out;
+}
+
+.settings-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.settings-header h2 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.settings-close {
+  background: var(--bg-tertiary);
+  color: var(--text-secondary);
+  padding: 4px 10px;
+  font-size: 0.85rem;
+}
+
+.settings-close:hover {
+  background: var(--border-color);
+}
+
+.settings-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.settings-group label {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.settings-group select {
+  padding: 8px 12px;
+  font-size: 0.95rem;
+}
+
+.settings-hint {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  margin: 0;
+}

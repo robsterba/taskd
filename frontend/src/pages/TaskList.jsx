@@ -29,6 +29,13 @@ const SORT_OPTS = [
   { value: '-name', label: 'Name (Z-A)' }
 ]
 
+const SORT_STORAGE_KEY = 'taskd:sort'
+
+const loadStoredSort = () => {
+  const saved = localStorage.getItem(SORT_STORAGE_KEY)
+  return SORT_OPTS.some(opt => opt.value === saved) ? saved : '-created_at'
+}
+
 const priorityClass = (priority) => {
   const map = {
     urgent: 'priority-urgent',
@@ -48,6 +55,8 @@ const statusClass = (status) => {
   }
   return map[status] || ''
 }
+
+const PRIORITY_RANK = { low: 0, medium: 1, high: 2, urgent: 3 }
 
 const priorityLabel = (priority) => {
   const map = {
@@ -143,20 +152,25 @@ function TaskList({
   onDeleteTask,
   onCompleteTask,
   onRefresh,
-  onViewTask
+  onViewTask,
+  refreshInterval = 30
 }) {
   const navigate = useNavigate()
   const [quickAdd, setQuickAdd] = useState('')
-  const [filters, setFilters] = useState({
+  const [filters, setFilters] = useState(() => ({
     status: ['todo', 'in_progress'],
     priority: [],
     tag: [],
     parent: 'none',
     search: '',
-    sort: '-created_at'
-  })
+    sort: loadStoredSort()
+  }))
   const [showFilters, setShowFilters] = useState(false)
-  const [polling, setPolling] = useState(true)
+
+  const updateSort = (sort) => {
+    localStorage.setItem(SORT_STORAGE_KEY, sort)
+    setFilters(prev => ({ ...prev, sort }))
+  }
 
   const filteredTasks = tasks.filter(task => {
     // Filter by status (array)
@@ -197,8 +211,8 @@ function TaskList({
         bVal = b.due_date ? new Date(b.due_date).getTime() : Infinity
         break
       case 'priority':
-        aVal = Object.keys(PRIORITY_OPTS).indexOf(a.priority)
-        bVal = Object.keys(PRIORITY_OPTS).indexOf(b.priority)
+        aVal = a.priority ? PRIORITY_RANK[a.priority] : -1
+        bVal = b.priority ? PRIORITY_RANK[b.priority] : -1
         break
       case 'name':
         aVal = a.name.toLowerCase()
@@ -214,14 +228,14 @@ function TaskList({
     return 0
   })
 
-  // Poll for changes every 30 seconds
+  // Poll for changes based on the configured refresh interval (0 = off)
   useEffect(() => {
-    if (!polling) return
+    if (!refreshInterval) return
     const interval = setInterval(() => {
       onRefresh()
-    }, 30000)
+    }, refreshInterval * 1000)
     return () => clearInterval(interval)
-  }, [polling, onRefresh])
+  }, [refreshInterval, onRefresh])
 
   const handleQuickAdd = useCallback(async (e) => {
     if (e.key === 'Enter' && quickAdd.trim()) {
@@ -243,18 +257,8 @@ function TaskList({
     e.stopPropagation()
     const newStatus = task.status === 'todo' ? 'in_progress' :
                      task.status === 'in_progress' ? 'done' : 'todo'
-
-    // Optimistic update
-    const originalTasks = [...tasks]
-    const updatedTask = { ...task, status: newStatus, updated_at: new Date().toISOString() }
-
-    try {
-      await onUpdateTask(task.id, { status: newStatus })
-    } catch (err) {
-      // Revert on error
-      setTasks(originalTasks)
-    }
-  }, [tasks, onUpdateTask])
+    await onUpdateTask(task.id, { status: newStatus })
+  }, [onUpdateTask])
 
   const handleComplete = useCallback(async (task, e) => {
     e.stopPropagation()
@@ -384,7 +388,7 @@ function TaskList({
             <label>Sort:</label>
             <select
               value={filters.sort}
-              onChange={(e) => setFilters({...filters, sort: e.target.value})}
+              onChange={(e) => updateSort(e.target.value)}
             >
               {SORT_OPTS.map(opt => (
                 <option key={opt.value} value={opt.value}>{opt.label}</option>
@@ -403,14 +407,17 @@ function TaskList({
           </div>
 
           <button
-            onClick={() => setFilters({
-              status: ['todo', 'in_progress'],
-              priority: [],
-              tag: [],
-              parent: 'none',
-              search: '',
-              sort: '-created_at'
-            })}
+            onClick={() => {
+              updateSort('-created_at')
+              setFilters(prev => ({
+                ...prev,
+                status: ['todo', 'in_progress'],
+                priority: [],
+                tag: [],
+                parent: 'none',
+                search: ''
+              }))
+            }}
             className="clear-filters"
           >
             Clear Filters
