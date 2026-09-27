@@ -199,21 +199,26 @@ def list_tasks(
     
     # Tag filtering
     if tag:
-        # Get tag IDs for all specified tags
-        normalized_tags = [normalize_tag_name(t) for t in tag]
+        # Get tag IDs for all specified tags. Tasks must have ALL of
+        # them, so if any requested tag does not exist, no task can
+        # match and we must return no results (not all tasks).
+        normalized_tags = {normalize_tag_name(t) for t in tag}
         tag_ids = db.query(Tag.id).filter(
             func.lower(Tag.name).in_(normalized_tags)
         ).all()
         tag_ids = [tid for tid, in tag_ids]
-        
-        if tag_ids:
-            # For each tag, we need to find tasks that have ALL of them
-            for tag_id in tag_ids:
-                query = query.filter(
-                    Task.id.in_(
-                        db.query(TaskTag.task_id).filter(TaskTag.tag_id == tag_id)
-                    )
+
+        if len(tag_ids) != len(normalized_tags):
+            # One or more requested tags do not exist
+            return [], 0
+
+        # For each tag, we need to find tasks that have ALL of them
+        for tag_id in tag_ids:
+            query = query.filter(
+                Task.id.in_(
+                    db.query(TaskTag.task_id).filter(TaskTag.tag_id == tag_id)
                 )
+            )
     
     # Apply all filters
     if filters:
