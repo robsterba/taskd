@@ -12,6 +12,8 @@ A lightweight, self-hosted task management application with REST API and web GUI
 - **Sorting**: Sort by created, updated, due date, priority, or name
 - **Web GUI**: Responsive React frontend served from the same container
 - **API**: Full REST API with OpenAPI documentation at `/docs`
+- **Home Assistant**: Native to-do list integration via [ha-taskd](https://github.com/robsterba/ha-taskd)
+- **n8n**: API endpoints purpose-built for workflow automation
 - **Theme Support**: Light and dark themes with system preference detection
 
 ## GUI Features
@@ -188,6 +190,21 @@ Automatically escalate overdue high-priority tasks:
 3. **Filter:** Tasks that are overdue
 4. **Action:** PATCH each task to add `"escalated"` tag and send alert
 
+## Home Assistant Integration
+
+[ha-taskd](https://github.com/robsterba/ha-taskd) is a companion Home Assistant integration that exposes your taskd tasks as a native **to-do list entity** (`todo.taskd`). View, create, complete, rename, schedule, and delete tasks directly from HA dashboards (the built-in To-Do List card) and HA Assist voice commands.
+
+Highlights:
+
+- **Full task lifecycle** — create, complete/uncomplete, rename, update description, set due dates, delete
+- **Quick-add syntax** — same as the taskd GUI: `#tag` tokens become tags, `!priority` sets priority
+- **Recurrence support** — completing a recurring task from HA spawns the next occurrence (handled server-side by taskd)
+- **Polling sync** — configurable scan interval (default 60s); changes made in the taskd GUI or via n8n appear in HA automatically
+- **`taskd.create_task` service** — for HA scripts and automations
+- **Source tagging** — tasks created in HA get `source: homeassistant`, so they can be filtered in the taskd GUI
+
+Install it from HACS (add `robsterba/ha-taskd` as a custom repository of type Integration), restart Home Assistant, then add the **taskd** integration from Settings → Devices & Services and point it at your taskd base URL (e.g. `http://192.168.1.140:8000`).
+
 ## Configuration
 
 Environment variables:
@@ -319,4 +336,4 @@ curl -X DELETE http://localhost:8000/api/v1/tasks/<id>
 
 ## License
 
-MIT License
+This project is licensed under the MIT License — see the [LICENSE](LICENSE) file for details.
