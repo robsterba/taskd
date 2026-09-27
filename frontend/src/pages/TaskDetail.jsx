@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import ReactMarkdown from 'react-markdown'
+import { tagChipStyle } from '../utils/tagColors'
 
 const priorityClass = (priority) => {
   const map = {
@@ -446,7 +447,7 @@ function TaskDetail({
                     checked={(editData.tags || []).includes(tag.name)}
                     onChange={() => handleTagChange(tag.name)}
                   />
-                  <span style={{ backgroundColor: tag.color || 'var(--accent)' }}>
+                  <span style={tagChipStyle(tag.color)}>
                     {tag.name}
                   </span>
                 </label>
@@ -473,7 +474,7 @@ function TaskDetail({
                     <span
                       key={tag}
                       className="tag-chip"
-                      style={{ backgroundColor: tagObj?.color || 'var(--accent)' }}
+                      style={tagChipStyle(tagObj?.color)}
                     >
                       {tag}
                     </span>

@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import ReactMarkdown from 'react-markdown'
+import { tagChipStyle } from '../utils/tagColors'
 
 const STATUS_OPTS = [
   { value: null, label: 'All' },
@@ -376,7 +377,7 @@ function TaskList({
                       setFilters({...filters, tag: newTags})
                     }}
                   />
-                  <span style={{ backgroundColor: tag.color || 'var(--accent)' }}>
+                  <span style={tagChipStyle(tag.color)}>
                     {tag.name}
                   </span>
                 </label>
