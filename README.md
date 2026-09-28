@@ -2,6 +2,21 @@
 
 A lightweight, self-hosted task management application with REST API and web GUI.
 
+## Screenshots
+
+**Main page (dark theme)**
+
+![Main page, dark theme](docs/screenshots/Main_page_night.png)
+
+**Task detail (light and dark themes)**
+
+![Task detail, light theme](docs/screenshots/task_view_light.png)
+![Task detail, dark theme](docs/screenshots/task_view_dark.png)
+
+**Task created by n8n automation** — automated tasks carry a `source` tag and filterable tags
+
+![Task created by n8n automation](docs/screenshots/n8n_integration.png)
+
 ## Features
 
 - **Task Management**: Create, read, update, delete tasks with full CRUD support
@@ -284,6 +299,8 @@ taskd/
 │   ├── public/        # Static assets
 │   │   └── favicon.svg
 │   └── src/           # React source
+├── docs/
+│   └── screenshots/   # README screenshots
 ├── Dockerfile         # Multi-stage build
 ├── docker-compose.yml
 └── README.md          # This file
