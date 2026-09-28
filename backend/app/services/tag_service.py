@@ -4,6 +4,7 @@ import re
 from typing import Optional, List
 from sqlalchemy.orm import Session
 from sqlalchemy import func, and_
+from sqlalchemy.exc import IntegrityError
 
 from ..models import Tag, Task, TaskTag
 from ..schemas import TagCreate, TagUpdate, TagResponse
@@ -45,7 +46,16 @@ def get_or_create_tag(db: Session, name: str, color: Optional[str] = None) -> Ta
         updated_at=datetime.now(timezone.utc)
     )
     db.add(new_tag)
-    db.commit()
+    try:
+        db.commit()
+    except IntegrityError:
+        # Another concurrent request created the same tag between our
+        # existence check and this insert. Roll back and use their row.
+        db.rollback()
+        existing = db.query(Tag).filter(func.lower(Tag.name) == normalized).first()
+        if not existing:
+            raise
+        return existing
     db.refresh(new_tag)
     return new_tag
 

@@ -26,6 +26,16 @@ def clean_db():
 
 
 @pytest.fixture
+def db_session():
+    """Raw SQLAlchemy session against the in-memory test database."""
+    db = TestingSessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+
+
+@pytest.fixture
 def client():
     """FastAPI TestClient backed by the in-memory database."""
 
