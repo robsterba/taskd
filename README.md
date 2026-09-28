@@ -10,8 +10,16 @@ A lightweight, self-hosted task management application with REST API and web GUI
 
 **Task detail (light and dark themes)**
 
-![Task detail, light theme](docs/screenshots/task_view_light.png)
-![Task detail, dark theme](docs/screenshots/task_view_dark.png)
+<table>
+  <tr>
+    <td width="50%" align="center">Light theme</td>
+    <td width="50%" align="center">Dark theme</td>
+  </tr>
+  <tr>
+    <td><img src="docs/screenshots/task_view_light.png" alt="Task detail, light theme"></td>
+    <td><img src="docs/screenshots/task_view_dark.png" alt="Task detail, dark theme"></td>
+  </tr>
+</table>
 
 **Task created by n8n automation** — automated tasks carry a `source` tag and filterable tags
 
