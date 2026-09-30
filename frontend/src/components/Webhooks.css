@@ -1,0 +1,142 @@
+.webhooks {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  border-top: 1px solid var(--border-subtle);
+  padding-top: 14px;
+}
+
+.webhooks-list {
+  gap: 10px;
+}
+
+.webhooks-error {
+  color: var(--status-error, #C0392B);
+  font-size: 0.8rem;
+  margin: 0;
+}
+
+.webhook-item {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px;
+  background: var(--bg-surface-alt);
+  border: 1px solid var(--border-subtle);
+  border-radius: 6px;
+}
+
+.webhook-item.inactive {
+  opacity: 0.6;
+}
+
+.webhook-url {
+  font-size: 0.82rem;
+  color: var(--text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.webhook-events {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.webhook-event-chip {
+  font-size: 0.7rem;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: var(--highlight);
+  color: var(--text-primary);
+}
+
+.webhook-actions {
+  display: flex;
+  gap: 6px;
+}
+
+.webhook-small-btn {
+  font-size: 0.75rem;
+  padding: 3px 8px;
+}
+
+.webhook-small-btn.danger {
+  color: var(--status-error, #C0392B);
+}
+
+.webhook-test-result {
+  font-size: 0.78rem;
+}
+
+.webhook-test-result.ok {
+  color: var(--status-success, #2E7D32);
+}
+
+.webhook-test-result.fail {
+  color: var(--status-error, #C0392B);
+}
+
+.webhook-deliveries {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-height: 140px;
+  overflow-y: auto;
+}
+
+.webhook-delivery-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.75rem;
+}
+
+.webhook-delivery-row .ok {
+  color: var(--status-success, #2E7D32);
+}
+
+.webhook-delivery-row .fail {
+  color: var(--status-error, #C0392B);
+}
+
+.webhook-delivery-event {
+  color: var(--text-secondary);
+}
+
+.webhook-delivery-time {
+  margin-left: auto;
+  color: var(--text-secondary);
+}
+
+.webhook-secret {
+  font-family: monospace;
+  font-size: 0.7rem;
+  color: var(--text-secondary);
+}
+
+.webhook-add {
+  gap: 8px;
+}
+
+.webhook-add input[type='url'],
+.webhook-add input[type='text'] {
+  padding: 8px 12px;
+  font-size: 0.9rem;
+}
+
+.webhook-event-picker {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.webhook-event-option {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  font-weight: 400;
+}

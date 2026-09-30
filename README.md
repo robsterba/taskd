@@ -37,6 +37,7 @@ A lightweight, self-hosted task management application with REST API and web GUI
 - **API**: Full REST API with OpenAPI documentation at `/docs`
 - **Home Assistant**: Native to-do list integration via [ha-taskd](https://github.com/robsterba/ha-taskd)
 - **n8n**: API endpoints purpose-built for workflow automation
+- **Webhooks**: Push task events to external URLs with HMAC-SHA256 signatures
 - **Theme Support**: Light and dark themes with system preference detection
 
 ## GUI Features
@@ -95,6 +96,15 @@ docker run -d \
 - `GET /api/v1/tags` - List all tags
 - `PATCH /api/v1/tags/{name}` - Update a tag
 - `DELETE /api/v1/tags/{name}` - Delete a tag
+
+### Webhooks
+- `GET /api/v1/webhooks` - List registered webhooks
+- `POST /api/v1/webhooks` - Register a webhook
+- `GET /api/v1/webhooks/{id}` - Get a single webhook
+- `PATCH /api/v1/webhooks/{id}` - Update a webhook
+- `DELETE /api/v1/webhooks/{id}` - Delete a webhook
+- `POST /api/v1/webhooks/{id}/test` - Send a test event to the webhook URL
+- `GET /api/v1/webhooks/{id}/deliveries` - List recent deliveries
 
 ### Health
 - `GET /api/v1/health` - Health check
@@ -212,6 +222,49 @@ Automatically escalate overdue high-priority tasks:
 2. **Action:** GET `/api/v1/tasks?status=todo&priority=high&due_before={{ $now }}`
 3. **Filter:** Tasks that are overdue
 4. **Action:** PATCH each task to add `"escalated"` tag and send alert
+
+## Webhooks
+
+For push-based automation, register a webhook and taskd will POST an event to your URL the moment a task changes — no polling required. Point an n8n **Webhook** trigger node (or any HTTP receiver) at the URL you register:
+
+```bash
+curl -X POST http://localhost:8000/api/v1/webhooks \
+  -H "Content-Type: application/json" \
+  -d '{"url": "https://n8n.example.com/webhook/taskd", "events": ["task.created", "task.completed"]}'
+```
+
+The response includes a generated `secret`. Every delivery is signed: the `X-taskd-Signature` header contains the HMAC-SHA256 hex digest of the request body, computed with that secret. Verify on the receiver:
+
+```python
+import hmac, hashlib
+expected = hmac.new(secret.encode(), raw_body, hashlib.sha256).hexdigest()
+hmac.compare_digest(expected, request.headers["X-taskd-Signature"])
+```
+
+### Events
+
+| Event | Fired when |
+|-------|-----------|
+| `task.created` | A task is created (one event, including any subtasks in the payload) |
+| `task.updated` | A task is patched (any change, including status changes to non-done states) |
+| `task.completed` | A task transitions to `done` (via PATCH or the complete endpoint) |
+| `task.deleted` | A task is deleted (payload includes the subtasks that were removed with it) |
+
+Payload shape:
+
+```json
+{
+  "event": "task.created",
+  "timestamp": "2026-09-28T14:32:11.123456+00:00",
+  "task": { "id": "…", "name": "…", "status": "todo", "tags": ["…"], "subtasks": [ … ] }
+}
+```
+
+Notes:
+- Subtasks created in the same `POST /api/v1/tasks` call are nested in the payload; a subtask added later fires its own `task.created` with `parent_task_id` set.
+- Completing a recurring task fires `task.completed` for the completed occurrence, followed by `task.created` for the spawned next occurrence.
+- Deliveries are retried up to 3 times (5s timeout each) and the last 50 delivery results per webhook are logged, viewable via `GET /api/v1/webhooks/{id}/deliveries` or the Settings panel in the GUI.
+- Webhooks are registered system-wide and fire for all tasks; filter on the receiving side by tags, source, or task fields.
 
 ## Home Assistant Integration
 

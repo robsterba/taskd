@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import Webhooks from './Webhooks'
 import './Settings.css'
 
 const REFRESH_INTERVAL_OPTS = [
@@ -57,6 +58,8 @@ function Settings({ settings, onChange }) {
               disable auto-refresh.
             </p>
           </div>
+
+          <Webhooks />
         </div>
       )}
     </div>

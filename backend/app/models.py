@@ -1,7 +1,7 @@
 """SQLAlchemy database models."""
 from datetime import datetime, timezone
 import uuid
-from sqlalchemy import Column, String, Text, DateTime, ForeignKey, JSON, Enum, Table, Boolean, Index
+from sqlalchemy import Column, String, Text, DateTime, ForeignKey, JSON, Enum, Table, Boolean, Index, Integer
 from sqlalchemy.orm import relationship, declarative_base
 from sqlalchemy.dialects.sqlite import TEXT
 
@@ -30,6 +30,35 @@ class Tag(Base):
     __table_args__ = (
         Index("idx_tag_name", "name"),
     )
+
+
+class Webhook(Base):
+    __tablename__ = "webhooks"
+
+    id = Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    url = Column(String(2048), nullable=False)
+    secret = Column(String(128), nullable=False)
+    events = Column(JSON, nullable=False, default=list)  # List of event type strings
+    active = Column(Boolean, nullable=False, default=True)
+    created_at = Column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
+    updated_at = Column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc), onupdate=datetime.now(timezone.utc))
+
+    deliveries = relationship("WebhookDelivery", back_populates="webhook", cascade="all, delete-orphan")
+
+
+class WebhookDelivery(Base):
+    __tablename__ = "webhook_deliveries"
+
+    id = Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    webhook_id = Column(String(36), ForeignKey("webhooks.id", ondelete="CASCADE"), nullable=False, index=True)
+    event_type = Column(String(50), nullable=False)
+    task_id = Column(String(36), nullable=True)
+    status = Column(String(20), nullable=False)  # "success" or "failed"
+    response_code = Column(String(10), nullable=True)
+    attempts = Column(Integer, nullable=False, default=1)
+    created_at = Column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
+
+    webhook = relationship("Webhook", back_populates="deliveries")
 
 
 class Task(Base):

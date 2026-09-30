@@ -135,3 +135,86 @@ class HealthResponse(BaseModel):
 # Error responses (FastAPI provides these by default, but we define them for consistency)
 class ErrorResponse(BaseModel):
     detail: str
+
+
+# Webhook schemas
+ALLOWED_WEBHOOK_EVENTS = [
+    "task.created",
+    "task.updated",
+    "task.completed",
+    "task.deleted",
+]
+
+
+class WebhookCreate(BaseModel):
+    url: str = Field(..., min_length=1, max_length=2048, description="Callback URL (http/https)")
+    events: List[str] = Field(..., min_length=1, description="Event types to subscribe to")
+    secret: Optional[str] = Field(None, min_length=8, max_length=128, description="HMAC secret; generated if omitted")
+    active: bool = Field(True, description="Whether the webhook is active")
+
+    @field_validator("url")
+    @classmethod
+    def validate_url(cls, v):
+        if not (v.startswith("http://") or v.startswith("https://")):
+            raise ValueError("URL must start with http:// or https://")
+        return v
+
+    @field_validator("events")
+    @classmethod
+    def validate_events(cls, v):
+        invalid = [e for e in v if e not in ALLOWED_WEBHOOK_EVENTS]
+        if invalid:
+            raise ValueError(f"Unknown event types: {', '.join(invalid)}. Allowed: {', '.join(ALLOWED_WEBHOOK_EVENTS)}")
+        return v
+
+
+class WebhookUpdate(BaseModel):
+    url: Optional[str] = Field(None, min_length=1, max_length=2048)
+    events: Optional[List[str]] = Field(None, min_length=1)
+    secret: Optional[str] = Field(None, min_length=8, max_length=128)
+    active: Optional[bool] = None
+
+    @field_validator("url")
+    @classmethod
+    def validate_url(cls, v):
+        if v is not None and not (v.startswith("http://") or v.startswith("https://")):
+            raise ValueError("URL must start with http:// or https://")
+        return v
+
+    @field_validator("events")
+    @classmethod
+    def validate_events(cls, v):
+        if v is not None:
+            invalid = [e for e in v if e not in ALLOWED_WEBHOOK_EVENTS]
+            if invalid:
+                raise ValueError(f"Unknown event types: {', '.join(invalid)}. Allowed: {', '.join(ALLOWED_WEBHOOK_EVENTS)}")
+        return v
+
+
+class WebhookResponse(BaseModel):
+    id: str
+    url: str
+    secret: str
+    events: List[str]
+    active: bool
+    created_at: datetime
+    updated_at: datetime
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class WebhookDeliveryResponse(BaseModel):
+    id: str
+    webhook_id: str
+    event_type: str
+    task_id: Optional[str] = None
+    status: str
+    response_code: Optional[int] = None
+    attempts: int
+    created_at: datetime
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class WebhookListResponse(BaseModel):
+    webhooks: List[WebhookResponse]

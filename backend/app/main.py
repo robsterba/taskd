@@ -9,6 +9,8 @@ from pathlib import Path
 from .database import init_db
 from .routers.tasks import router as tasks_router
 from .routers.tags import router as tags_router
+from .routers.webhooks import router as webhooks_router
+from .services.webhook_service import start_worker, stop_worker
 from .version import VERSION, get_version
 
 # Create FastAPI app
@@ -33,13 +35,21 @@ app.add_middleware(
 # Include routers
 app.include_router(tasks_router)
 app.include_router(tags_router)
+app.include_router(webhooks_router)
 
 
-# Initialize database on startup
+# Initialize database and start the webhook delivery worker on startup
 @app.on_event("startup")
 def startup_event():
     """Initialize database on application startup."""
     init_db()
+    start_worker()
+
+
+@app.on_event("shutdown")
+def shutdown_event():
+    """Stop the webhook delivery worker on shutdown."""
+    stop_worker()
 
 
 # Serve static files for React frontend

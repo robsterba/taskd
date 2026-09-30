@@ -1,5 +1,4 @@
 import { useState, useEffect, useCallback } from 'react'
-import { useNavigate } from 'react-router-dom'
 import ReactMarkdown from 'react-markdown'
 import { tagChipStyle } from '../utils/tagColors'
 
@@ -58,7 +57,6 @@ const statusClass = (status) => {
 }
 
 const PRIORITY_RANK = { low: 0, medium: 1, high: 2, urgent: 3 }
-
 const priorityLabel = (priority) => {
   const map = {
     urgent: 'Urgent',
@@ -69,18 +67,7 @@ const priorityLabel = (priority) => {
   return map[priority] || priority
 }
 
-const statusLabel = (status) => {
-  const map = {
-    todo: 'Todo',
-    in_progress: 'In Progress',
-    done: 'Done',
-    archived: 'Archived'
-  }
-  return map[status] || status
-}
-
 const parseQuickAdd = (text) => {
-  const tags = []
   const priorityMatch = text.match(/!(\w+)/)
   let priority = null
 
@@ -150,13 +137,10 @@ function TaskList({
   loading,
   onCreateTask,
   onUpdateTask,
-  onDeleteTask,
-  onCompleteTask,
   onRefresh,
   onViewTask,
   refreshInterval = 30
 }) {
-  const navigate = useNavigate()
   const [quickAdd, setQuickAdd] = useState('')
   const [filters, setFilters] = useState(() => ({
     status: ['todo', 'in_progress'],
@@ -260,11 +244,6 @@ function TaskList({
                      task.status === 'in_progress' ? 'done' : 'todo'
     await onUpdateTask(task.id, { status: newStatus })
   }, [onUpdateTask])
-
-  const handleComplete = useCallback(async (task, e) => {
-    e.stopPropagation()
-    await onCompleteTask(task.id)
-  }, [onCompleteTask])
 
   const handleToggleSubtaskStatus = useCallback(async (task, subtask, e) => {
     e.stopPropagation()
