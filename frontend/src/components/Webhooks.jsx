@@ -32,9 +32,11 @@ function Webhooks() {
     }
   }
 
-  const ensureLoaded = () => {
-    if (webhooks === null) loadWebhooks()
-  }
+  // The component only mounts when the settings panel opens,
+  // so this refreshes the list on every open
+  useEffect(() => {
+    loadWebhooks()
+  }, [])
 
   const addWebhook = async (e) => {
     e.preventDefault()
@@ -107,7 +109,7 @@ function Webhooks() {
   }
 
   return (
-    <div className="webhooks" onPointerDown={ensureLoaded} onKeyDown={ensureLoaded}>
+    <div className="webhooks">
       <div className="settings-group webhooks-list">
         <label>Webhooks</label>
         {error && <p className="webhooks-error">{error}</p>}
