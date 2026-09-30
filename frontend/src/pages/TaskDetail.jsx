@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 import ReactMarkdown from 'react-markdown'
 import { tagChipStyle } from '../utils/tagColors'
 
@@ -11,16 +11,6 @@ const priorityClass = (priority) => {
     low: 'priority-low'
   }
   return map[priority] || ''
-}
-
-const statusClass = (status) => {
-  const map = {
-    todo: 'status-todo',
-    in_progress: 'status-in_progress',
-    done: 'status-done',
-    archived: 'status-archived'
-  }
-  return map[status] || ''
 }
 
 const priorityLabel = (priority) => {
@@ -99,7 +89,6 @@ function TaskDetail({
   onCompleteTask,
   onNavigateBack
 }) {
-  const navigate = useNavigate()
   const { taskId } = useParams()
   const [task, setTask] = useState(null)
   const [editing, setEditing] = useState(false)

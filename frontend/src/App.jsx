@@ -179,19 +179,6 @@ function App() {
     }
   }
 
-  const getTask = async (taskId) => {
-    try {
-      const response = await fetch(`${API_BASE}/tasks/${taskId}`)
-      if (!response.ok) {
-        throw new Error('Failed to fetch task')
-      }
-      return await response.json()
-    } catch (err) {
-      setError(err.message)
-      throw err
-    }
-  }
-
   return (
     <div className="app">
       <header className="app-header">
