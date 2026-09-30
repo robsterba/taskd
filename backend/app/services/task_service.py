@@ -9,6 +9,7 @@ from dateutil.relativedelta import relativedelta
 from ..models import Task, Tag, TaskTag
 from ..schemas import TaskCreate, TaskUpdate, TaskResponse, TaskDetailResponse, TaskListResponse
 from .tag_service import get_or_create_tags, normalize_tag_name
+from .webhook_service import dispatch_event
 from ..utils.recurrence import compute_next_due_date, should_spawn_next_occurrence
 
 
@@ -33,7 +34,7 @@ PRIORITY_ORDER = {
 }
 
 
-def create_task(db: Session, task_data: TaskCreate, source: Optional[str] = None) -> Task:
+def create_task(db: Session, task_data: TaskCreate, source: Optional[str] = None, _emit_event: bool = True) -> Task:
     """
     Create a new task.
     
@@ -41,6 +42,8 @@ def create_task(db: Session, task_data: TaskCreate, source: Optional[str] = None
         db: Database session
         task_data: Task creation data
         source: Source of task creation (defaults to 'api')
+        _emit_event: Emit a task.created webhook event (False for internally
+            spawned subtasks so the parent event carries the full subtree)
     
     Returns:
         The created Task instance
@@ -108,8 +111,18 @@ def create_task(db: Session, task_data: TaskCreate, source: Optional[str] = None
                     parent_task_id=task.id,
                     source=source or "api"
                 ),
-                source=source or "api"
+                source=source or "api",
+                _emit_event=False
             )
+    
+    # Emit webhook event after the full task tree exists
+    if _emit_event:
+        dispatch_event(
+            db,
+            "task.created",
+            get_task_detail_response(db, task).model_dump(mode="json"),
+            task_id=task.id
+        )
     
     return task
 
@@ -289,6 +302,9 @@ def update_task(db: Session, task_id: str, update_data: TaskUpdate) -> Optional[
     if not task:
         return None
     
+    # Capture pre-update status to distinguish completed from updated events
+    previous_status = task.status
+    
     # Prevent creating subtasks of subtasks
     if update_data.parent_task_id:
         parent_task = db.query(Task).filter(Task.id == update_data.parent_task_id).first()
@@ -328,6 +344,18 @@ def update_task(db: Session, task_id: str, update_data: TaskUpdate) -> Optional[
     db.commit()
     db.refresh(task)
     
+    # Emit webhook event: completion is its own event type
+    if previous_status != "done" and task.status == "done":
+        event_type = "task.completed"
+    else:
+        event_type = "task.updated"
+    dispatch_event(
+        db,
+        event_type,
+        get_task_detail_response(db, task).model_dump(mode="json"),
+        task_id=task.id
+    )
+    
     return task
 
 
@@ -346,9 +374,14 @@ def delete_task(db: Session, task_id: str) -> bool:
     if not task:
         return False
     
+    # Snapshot the task (with subtasks) before deletion for the webhook payload
+    task_snapshot = get_task_detail_response(db, task).model_dump(mode="json")
+    
     # Delete the task (cascade will handle subtasks due to relationship config)
     db.delete(task)
     db.commit()
+    
+    dispatch_event(db, "task.deleted", task_snapshot, task_id=task_id)
     return True
 
 
@@ -373,12 +406,30 @@ def complete_task(db: Session, task_id: str) -> Optional[Task]:
         task.updated_at = datetime.now(timezone.utc)
         
         # Spawn next occurrence if recurring
+        spawned_task = None
         if should_spawn_next_occurrence(task):
-            new_task = clone_task_for_recurrence(db, task)
-            db.add(new_task)
+            spawned_task = clone_task_for_recurrence(db, task)
+            db.add(spawned_task)
         
         db.commit()
         db.refresh(task)
+    
+        dispatch_event(
+            db,
+            "task.completed",
+            get_task_detail_response(db, task).model_dump(mode="json"),
+            task_id=task.id
+        )
+        
+        # The next occurrence of a recurring task is a new task in the system
+        if spawned_task is not None:
+            db.refresh(spawned_task)
+            dispatch_event(
+                db,
+                "task.created",
+                get_task_detail_response(db, spawned_task).model_dump(mode="json"),
+                task_id=spawned_task.id
+            )
     
     return task
 

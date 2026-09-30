@@ -18,7 +18,10 @@
   position: absolute;
   top: calc(100% + 8px);
   right: 0;
-  width: 280px;
+  width: 420px;
+  max-width: calc(100vw - 24px);
+  max-height: calc(100vh - 80px);
+  overflow-y: auto;
   background: var(--bg-surface);
   border: 1px solid var(--border-subtle);
   border-radius: 8px;
