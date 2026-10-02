@@ -11,6 +11,11 @@ const REFRESH_INTERVAL_OPTS = [
   { value: 900, label: 'Every 15 minutes' }
 ]
 
+const DARK_THEME_OPTS = [
+  { value: 'dark', label: 'Blue (default)' },
+  { value: 'amoled', label: 'AMOLED Black' }
+]
+
 function Settings({ settings, onChange }) {
   const [open, setOpen] = useState(false)
 
@@ -56,6 +61,29 @@ function Settings({ settings, onChange }) {
             <p className="settings-hint">
               How often the task list refreshes automatically. Set to Off to
               disable auto-refresh.
+            </p>
+          </div>
+
+          <div className="settings-group">
+            <label>Dark theme</label>
+            <div className="radio-group" role="radiogroup" aria-label="Dark theme">
+              {DARK_THEME_OPTS.map(opt => (
+                <label key={opt.value} className="settings-radio">
+                  <input
+                    type="radio"
+                    name="dark-theme"
+                    value={opt.value}
+                    checked={(settings.darkMode || 'dark') === opt.value}
+                    onChange={() => onChange({ ...settings, darkMode: opt.value })}
+                  />
+                  {opt.label}
+                </label>
+              ))}
+            </div>
+            <p className="settings-hint">
+              Which dark variant the header button switches to. AMOLED Black
+              uses a true black background, ideal for OLED screens. Changing
+              this while in dark mode applies immediately.
             </p>
           </div>
 

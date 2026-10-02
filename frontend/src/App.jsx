@@ -11,7 +11,7 @@ import './pages/TaskDetail.css'
 import './pages/NotFound.css'
 
 const SETTINGS_STORAGE_KEY = 'taskd:settings'
-const DEFAULT_SETTINGS = { refreshInterval: 30 }
+const DEFAULT_SETTINGS = { refreshInterval: 30, darkMode: 'dark' }
 
 function App() {
   const [tasks, setTasks] = useState([])
@@ -33,7 +33,7 @@ function App() {
 
     // Check system preference for dark mode
     if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-      return 'dark'
+      return settings.darkMode
     }
     return 'light'
   })
@@ -63,7 +63,18 @@ function App() {
   }, [API_BASE])
 
   const toggleTheme = () => {
-    setTheme(prev => prev === 'light' ? 'dark' : 'light')
+    // Light <-> the user's preferred dark variant (blue or AMOLED)
+    setTheme(prev => prev === 'light' ? settings.darkMode : 'light')
+  }
+
+  const handleSettingsChange = (newSettings) => {
+    const prevDarkMode = settings.darkMode
+    setSettings(newSettings)
+
+    // Apply a changed dark variant immediately when in dark mode
+    if (theme !== 'light' && newSettings.darkMode !== prevDarkMode) {
+      setTheme(newSettings.darkMode)
+    }
   }
 
   const fetchTasks = async (params = {}) => {
@@ -187,7 +198,7 @@ function App() {
           {appVersion && <span className="version-badge">v{appVersion}</span>}
         </div>
         <div className="header-actions">
-          <Settings settings={settings} onChange={setSettings} />
+          <Settings settings={settings} onChange={handleSettingsChange} />
           <button
             className="theme-toggle"
             onClick={toggleTheme}

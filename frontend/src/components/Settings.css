@@ -78,3 +78,19 @@
   color: var(--text-secondary);
   margin: 0;
 }
+
+.radio-group {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.settings-radio {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.9rem;
+  font-weight: 400;
+  color: var(--text-primary);
+  cursor: pointer;
+}
