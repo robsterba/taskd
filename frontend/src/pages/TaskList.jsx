@@ -240,8 +240,7 @@ function TaskList({
 
   const handleToggleStatus = useCallback(async (task, e) => {
     e.stopPropagation()
-    const newStatus = task.status === 'todo' ? 'in_progress' :
-                     task.status === 'in_progress' ? 'done' : 'todo'
+    const newStatus = task.status === 'done' ? 'todo' : 'done'
     await onUpdateTask(task.id, { status: newStatus })
   }, [onUpdateTask])
 
