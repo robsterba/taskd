@@ -286,6 +286,42 @@ def list_tasks(
     return tasks, total
 
 
+def sync_parent_status(db: Session, parent_task_id: str) -> Optional[Task]:
+    """
+    Derive a parent task's status from subtask completion.
+
+    While the parent is 'todo' or 'in_progress', its status tracks its
+    subtasks: any completed subtask means 'in_progress', none means 'todo'.
+    A parent manually marked 'done' or 'archived' keeps its status.
+
+    Does not commit; callers persist the change alongside their own.
+
+    Args:
+        db: Database session
+        parent_task_id: ID of the parent task to sync
+
+    Returns:
+        The parent Task if its status changed, otherwise None
+    """
+    parent = db.query(Task).filter(Task.id == parent_task_id).first()
+    if not parent or parent.status not in ("todo", "in_progress"):
+        return None
+
+    # The caller's pending subtask change must be visible to the count
+    db.flush()
+    done_subtasks = db.query(Task).filter(
+        Task.parent_task_id == parent.id,
+        Task.status == "done"
+    ).count()
+
+    derived_status = "in_progress" if done_subtasks > 0 else "todo"
+    if parent.status == derived_status:
+        return None
+
+    parent.status = derived_status
+    return parent
+
+
 def update_task(db: Session, task_id: str, update_data: TaskUpdate) -> Optional[Task]:
     """
     Update a task.
@@ -341,9 +377,17 @@ def update_task(db: Session, task_id: str, update_data: TaskUpdate) -> Optional[
             db.add(association)
     
     task.updated_at = datetime.now(timezone.utc)
+
+    # Subtask status changes derive the parent's status while it is active
+    parent_changed = None
+    if task.parent_task_id:
+        parent_changed = sync_parent_status(db, task.parent_task_id)
+        if parent_changed:
+            parent_changed.updated_at = datetime.now(timezone.utc)
+
     db.commit()
     db.refresh(task)
-    
+
     # Emit webhook event: completion is its own event type
     if previous_status != "done" and task.status == "done":
         event_type = "task.completed"
@@ -355,7 +399,16 @@ def update_task(db: Session, task_id: str, update_data: TaskUpdate) -> Optional[
         get_task_detail_response(db, task).model_dump(mode="json"),
         task_id=task.id
     )
-    
+
+    if parent_changed:
+        db.refresh(parent_changed)
+        dispatch_event(
+            db,
+            "task.updated",
+            get_task_detail_response(db, parent_changed).model_dump(mode="json"),
+            task_id=parent_changed.id
+        )
+
     return task
 
 
@@ -404,23 +457,39 @@ def complete_task(db: Session, task_id: str) -> Optional[Task]:
     if task.status != "done":
         task.status = "done"
         task.updated_at = datetime.now(timezone.utc)
-        
+
+        # Completing a subtask derives the parent's status while it is active
+        parent_changed = None
+        if task.parent_task_id:
+            parent_changed = sync_parent_status(db, task.parent_task_id)
+            if parent_changed:
+                parent_changed.updated_at = datetime.now(timezone.utc)
+
         # Spawn next occurrence if recurring
         spawned_task = None
         if should_spawn_next_occurrence(task):
             spawned_task = clone_task_for_recurrence(db, task)
             db.add(spawned_task)
-        
+
         db.commit()
         db.refresh(task)
-    
+
         dispatch_event(
             db,
             "task.completed",
             get_task_detail_response(db, task).model_dump(mode="json"),
             task_id=task.id
         )
-        
+
+        if parent_changed:
+            db.refresh(parent_changed)
+            dispatch_event(
+                db,
+                "task.updated",
+                get_task_detail_response(db, parent_changed).model_dump(mode="json"),
+                task_id=parent_changed.id
+            )
+
         # The next occurrence of a recurring task is a new task in the system
         if spawned_task is not None:
             db.refresh(spawned_task)
