@@ -38,13 +38,13 @@ A lightweight, self-hosted task management application with REST API and web GUI
 - **Home Assistant**: Native to-do list integration via [ha-taskd](https://github.com/robsterba/ha-taskd)
 - **n8n**: API endpoints purpose-built for workflow automation
 - **Webhooks**: Push task events to external URLs with HMAC-SHA256 signatures
-- **Theme Support**: Light and dark themes with system preference detection
+- **Theme Support**: Light theme plus two dark themes (Blue and AMOLED Black) with system preference detection
 
 ## GUI Features
 
 ### Theme Toggle
 
-The GUI supports light and dark themes. Click the theme toggle button (🌙/☀️) in the top-right corner to switch between themes. Your preference is saved to localStorage and will persist across sessions. On first visit, the app automatically detects your system's color scheme preference.
+The GUI supports a light theme and two dark themes. Click the theme toggle button (sun/moon icon) in the top-right corner to switch between light and your preferred dark theme. Choose the dark variant (Blue or AMOLED Black) in Settings; it applies immediately while in dark mode. Your preference is saved to localStorage and will persist across sessions. On first visit, the app automatically detects your system's color scheme preference.
 
 ## Quick Start
 
