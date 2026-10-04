@@ -4,9 +4,18 @@ A lightweight, self-hosted task management application with REST API and web GUI
 
 ## Screenshots
 
-**Main page (dark theme)**
+**Main page (both dark variants)**
 
-![Main page, dark theme](docs/screenshots/Main_page_night.png)
+<table>
+  <tr>
+    <td width="50%" align="center">Dark (Blue)</td>
+    <td width="50%" align="center">Dark (AMOLED Black)</td>
+  </tr>
+  <tr>
+    <td><img src="docs/screenshots/Main_page_night.png" alt="Main page, dark blue theme"></td>
+    <td><img src="docs/screenshots/Main_page_amoled.png" alt="Main page, AMOLED black theme"></td>
+  </tr>
+</table>
 
 **Task detail (light and dark themes)**
 
