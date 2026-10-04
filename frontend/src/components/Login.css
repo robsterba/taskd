@@ -1,0 +1,44 @@
+.login-overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-base);
+  z-index: 100;
+}
+
+.login-card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+  max-width: 320px;
+  margin: 16px;
+  padding: 24px;
+}
+
+.login-card h2 {
+  margin: 0;
+  font-size: 1.4rem;
+  color: var(--text-primary);
+}
+
+.login-hint {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.login-input {
+  width: 100%;
+}
+
+.login-error {
+  color: var(--danger);
+  font-size: 0.85rem;
+}
+
+.login-submit {
+  justify-content: center;
+}

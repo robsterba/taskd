@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { apiFetch } from '../utils/api'
 import './Webhooks.css'
 
 const EVENT_TYPES = [
@@ -22,7 +23,7 @@ function Webhooks() {
 
   const loadWebhooks = async () => {
     try {
-      const res = await fetch(`${API_BASE}/webhooks`)
+      const res = await apiFetch(`${API_BASE}/webhooks`)
       if (!res.ok) throw new Error('Failed to load webhooks')
       const data = await res.json()
       setWebhooks(data.webhooks || [])
@@ -44,7 +45,7 @@ function Webhooks() {
     try {
       const body = { url, events }
       if (secret.trim()) body.secret = secret.trim()
-      const res = await fetch(`${API_BASE}/webhooks`, {
+      const res = await apiFetch(`${API_BASE}/webhooks`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body)
@@ -69,7 +70,7 @@ function Webhooks() {
   }
 
   const toggleActive = async (webhook) => {
-    await fetch(`${API_BASE}/webhooks/${webhook.id}`, {
+    await apiFetch(`${API_BASE}/webhooks/${webhook.id}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ active: !webhook.active })
@@ -78,13 +79,13 @@ function Webhooks() {
   }
 
   const removeWebhook = async (webhook) => {
-    await fetch(`${API_BASE}/webhooks/${webhook.id}`, { method: 'DELETE' })
+    await apiFetch(`${API_BASE}/webhooks/${webhook.id}`, { method: 'DELETE' })
     loadWebhooks()
   }
 
   const sendTest = async (webhook) => {
     try {
-      const res = await fetch(`${API_BASE}/webhooks/${webhook.id}/test`, { method: 'POST' })
+      const res = await apiFetch(`${API_BASE}/webhooks/${webhook.id}/test`, { method: 'POST' })
       const data = await res.json()
       setTestResults(prev => ({
         ...prev,
@@ -102,7 +103,7 @@ function Webhooks() {
       setExpanded(null)
       return
     }
-    const res = await fetch(`${API_BASE}/webhooks/${webhook.id}/deliveries`)
+    const res = await apiFetch(`${API_BASE}/webhooks/${webhook.id}/deliveries`)
     const data = await res.json()
     setDeliveries(prev => ({ ...prev, [webhook.id]: data.deliveries || [] }))
     setExpanded(webhook.id)

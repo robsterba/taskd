@@ -1,15 +1,16 @@
 """Main FastAPI application for taskd."""
 import os
-from fastapi import FastAPI, Request, HTTPException
+from fastapi import FastAPI, Request, HTTPException, Depends
 from fastapi.staticfiles import StaticFiles
-from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse
 from pathlib import Path
 
 from .database import init_db
+from .auth import require_api_key
 from .routers.tasks import router as tasks_router
 from .routers.tags import router as tags_router
 from .routers.webhooks import router as webhooks_router
+from .routers.system import router as system_router
 from .services.webhook_service import start_worker, stop_worker
 from .version import VERSION, get_version
 
@@ -23,19 +24,18 @@ app = FastAPI(
     openapi_url="/api/v1/openapi.json"
 )
 
-# Add CORS middleware (even though not strictly needed in same-container setup)
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+
+# The GUI and API are served from the same origin, and the Vite dev server
+# proxies /api to the backend, so no CORS middleware is needed.
 
 # Include routers
-app.include_router(tasks_router)
-app.include_router(tags_router)
-app.include_router(webhooks_router)
+# Health and version stay unauthenticated (container healthchecks, HA setup
+# validation); everything else requires the X-API-Key header when
+# TASKD_API_KEY is set.
+app.include_router(system_router)
+app.include_router(tasks_router, dependencies=[Depends(require_api_key)])
+app.include_router(tags_router, dependencies=[Depends(require_api_key)])
+app.include_router(webhooks_router, dependencies=[Depends(require_api_key)])
 
 
 # Initialize database and start the webhook delivery worker on startup

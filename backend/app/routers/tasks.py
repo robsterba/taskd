@@ -7,7 +7,7 @@ from sqlalchemy.orm import Session
 from ..database import get_db
 from ..schemas import (
     TaskCreate, TaskUpdate, TaskResponse, TaskDetailResponse,
-    TaskListResponse, TaskChangeResponse, HealthResponse
+    TaskListResponse, TaskChangeResponse
 )
 from ..services.task_service import (
     create_task, get_task, list_tasks, update_task, delete_task,
@@ -15,25 +15,8 @@ from ..services.task_service import (
 )
 from ..services.tag_service import get_or_create_tags
 from ..models import Task
-from ..version import VERSION, get_version as read_version
 
 router = APIRouter(prefix="/api/v1", tags=["tasks"])
-
-
-@router.get("/health", response_model=HealthResponse)
-def health_check():
-    """Health check endpoint."""
-    return HealthResponse(
-        status="ok",
-        version=read_version(),
-        timestamp=datetime.now(timezone.utc)
-    )
-
-
-@router.get("/version")
-def get_version():
-    """Get the application version."""
-    return {"version": read_version()}
 
 
 @router.get("/tasks", response_model=TaskListResponse)

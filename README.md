@@ -47,6 +47,7 @@ A lightweight, self-hosted task management application with REST API and web GUI
 - **Home Assistant**: Native to-do list integration via [ha-taskd](https://github.com/robsterba/ha-taskd)
 - **n8n**: API endpoints purpose-built for workflow automation
 - **Webhooks**: Push task events to external URLs with HMAC-SHA256 signatures
+- **Authentication**: Optional API key auth via `TASKD_API_KEY` (off by default)
 - **Theme Support**: Light theme plus two dark themes (Blue and AMOLED Black) with system preference detection
 
 ## GUI Features
@@ -290,11 +291,29 @@ Highlights:
 
 Install it from HACS (add `robsterba/ha-taskd` as a custom repository of type Integration), restart Home Assistant, then add the **taskd** integration from Settings → Devices & Services and point it at your taskd base URL (e.g. `http://192.168.1.140:8000`).
 
+## Authentication
+
+taskd supports optional API key authentication for private networks. It is **off by default**; set the `TASKD_API_KEY` environment variable to enable it.
+
+When enabled:
+- All `/api/v1/*` endpoints except `/health` and `/version` require an `X-API-Key` header
+- The web GUI shows a login screen and stores the key in your browser's localStorage
+- API clients (n8n, ha-taskd, scripts) add the header to each request, e.g.:
+
+```bash
+curl -H "X-API-Key: your-secret-key" http://localhost:8000/api/v1/tasks
+```
+
+`/health` and `/version` stay unauthenticated so container healthchecks and HA setup validation keep working. `/docs` (OpenAPI) remains unauthenticated on the assumption the server is only reachable on your LAN.
+
+To disable authentication, simply unset `TASKD_API_KEY` and restart.
+
 ## Configuration
 
 Environment variables:
 - `PORT` - HTTP port (default: 8000)
 - `DATA_DIR` - Database directory (default: /data)
+- `TASKD_API_KEY` - Optional API key. When set, all API endpoints (except `/health` and `/version`) require it in the `X-API-Key` header. Unset = no authentication.
 
 ## Versioning
 

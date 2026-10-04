@@ -12,6 +12,8 @@ services:
     environment:
       - PORT=8000
       - DATA_DIR=/data
+      # Uncomment to require an X-API-Key header on all API endpoints
+      # - TASKD_API_KEY=change-me
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/api/v1/health"]
       interval: 30s

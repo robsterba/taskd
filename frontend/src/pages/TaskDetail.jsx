@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { useParams } from 'react-router-dom'
 import ReactMarkdown from 'react-markdown'
 import { tagChipStyle } from '../utils/tagColors'
+import { apiFetch } from '../utils/api'
 
 const priorityClass = (priority) => {
   const map = {
@@ -105,7 +106,7 @@ function TaskDetail({
       // Always fetch from API to get full details including subtasks
       if (taskId) {
         try {
-          const response = await fetch(`${API_BASE}/tasks/${taskId}`)
+          const response = await apiFetch(`${API_BASE}/tasks/${taskId}`)
           if (response.ok) {
             const data = await response.json()
             setTask(data)
@@ -194,7 +195,7 @@ function TaskDetail({
         source: 'gui'
       }
 
-      const response = await fetch(`${API_BASE}/tasks`, {
+      const response = await apiFetch(`${API_BASE}/tasks`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -206,7 +207,7 @@ function TaskDetail({
       if (response.ok) {
         setNewSubtask('')
         // Refresh the task
-        const updatedResponse = await fetch(`${API_BASE}/tasks/${task.id}`)
+        const updatedResponse = await apiFetch(`${API_BASE}/tasks/${task.id}`)
         if (updatedResponse.ok) {
           const updatedTask = await updatedResponse.json()
           setTask(updatedTask)
@@ -227,7 +228,7 @@ function TaskDetail({
         status: subtask.status === 'done' ? 'todo' : 'done'
       })
       // Refresh the task
-      const response = await fetch(`${API_BASE}/tasks/${task.id}`)
+      const response = await apiFetch(`${API_BASE}/tasks/${task.id}`)
       if (response.ok) {
         const updatedTask = await response.json()
         setTask(updatedTask)
@@ -244,7 +245,7 @@ function TaskDetail({
       try {
         await onDeleteTask(subtask.id)
         // Refresh the task
-        const response = await fetch(`${API_BASE}/tasks/${task.id}`)
+        const response = await apiFetch(`${API_BASE}/tasks/${task.id}`)
         if (response.ok) {
           const updatedTask = await response.json()
           setTask(updatedTask)

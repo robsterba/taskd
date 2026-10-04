@@ -4,11 +4,14 @@ import TaskList from './pages/TaskList'
 import TaskDetail from './pages/TaskDetail'
 import NotFound from './pages/NotFound'
 import Settings from './components/Settings'
+import Login from './components/Login'
+import { apiFetch, UNAUTHORIZED_EVENT } from './utils/api'
 import './App.css'
 import './index.css'
 import './pages/TaskList.css'
 import './pages/TaskDetail.css'
 import './pages/NotFound.css'
+import './components/Login.css'
 
 const SETTINGS_STORAGE_KEY = 'taskd:settings'
 const DEFAULT_SETTINGS = { refreshInterval: 30, darkMode: 'dark' }
@@ -38,9 +41,24 @@ function App() {
     return 'light'
   })
   const [appVersion, setAppVersion] = useState('')
+  const [needsAuth, setNeedsAuth] = useState(false)
   const navigate = useNavigate()
 
   const API_BASE = '/api/v1'
+
+  // Show the login screen whenever the API rejects our key
+  useEffect(() => {
+    const onUnauthorized = () => setNeedsAuth(true)
+    window.addEventListener(UNAUTHORIZED_EVENT, onUnauthorized)
+    return () => window.removeEventListener(UNAUTHORIZED_EVENT, onUnauthorized)
+  }, [])
+
+  const handleLoginSuccess = () => {
+    setNeedsAuth(false)
+    setError(null)
+    fetchTasks()
+    fetchTags()
+  }
 
   // Apply theme on mount and when theme changes
   useEffect(() => {
@@ -56,7 +74,7 @@ function App() {
 
   // Fetch app version on mount
   useEffect(() => {
-    fetch(`${API_BASE}/version`)
+    apiFetch(`${API_BASE}/version`)
       .then(res => res.json())
       .then(data => setAppVersion(data.version || ''))
       .catch(() => setAppVersion(''))
@@ -82,7 +100,7 @@ function App() {
     setError(null)
     try {
       const queryString = new URLSearchParams(params).toString()
-      const response = await fetch(`${API_BASE}/tasks?${queryString}`)
+      const response = await apiFetch(`${API_BASE}/tasks?${queryString}`)
       if (!response.ok) {
         throw new Error('Failed to fetch tasks')
       }
@@ -97,7 +115,7 @@ function App() {
 
   const fetchTags = async () => {
     try {
-      const response = await fetch(`${API_BASE}/tags`)
+      const response = await apiFetch(`${API_BASE}/tags`)
       if (!response.ok) {
         throw new Error('Failed to fetch tags')
       }
@@ -115,7 +133,7 @@ function App() {
 
   const createTask = async (taskData, source = 'gui') => {
     try {
-      const response = await fetch(`${API_BASE}/tasks`, {
+      const response = await apiFetch(`${API_BASE}/tasks`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -138,7 +156,7 @@ function App() {
 
   const updateTask = async (taskId, updateData) => {
     try {
-      const response = await fetch(`${API_BASE}/tasks/${taskId}`, {
+      const response = await apiFetch(`${API_BASE}/tasks/${taskId}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json'
@@ -159,7 +177,7 @@ function App() {
 
   const deleteTask = async (taskId) => {
     try {
-      const response = await fetch(`${API_BASE}/tasks/${taskId}`, {
+      const response = await apiFetch(`${API_BASE}/tasks/${taskId}`, {
         method: 'DELETE'
       })
       if (!response.ok) {
@@ -175,7 +193,7 @@ function App() {
 
   const completeTask = async (taskId) => {
     try {
-      const response = await fetch(`${API_BASE}/tasks/${taskId}/complete`, {
+      const response = await apiFetch(`${API_BASE}/tasks/${taskId}/complete`, {
         method: 'POST'
       })
       if (!response.ok) {
@@ -188,6 +206,10 @@ function App() {
       setError(err.message)
       throw err
     }
+  }
+
+  if (needsAuth) {
+    return <Login onSuccess={handleLoginSuccess} />
   }
 
   return (
