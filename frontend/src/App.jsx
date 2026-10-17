@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { Routes, Route, useNavigate } from 'react-router-dom'
 import TaskList from './pages/TaskList'
 import TaskDetail from './pages/TaskDetail'
@@ -14,11 +14,19 @@ import './pages/NotFound.css'
 import './components/Login.css'
 
 const SETTINGS_STORAGE_KEY = 'taskd:settings'
-const DEFAULT_SETTINGS = { refreshInterval: 30, darkMode: 'dark' }
+const DEFAULT_SETTINGS = {
+  refreshInterval: 30,
+  darkMode: 'dark',
+  integrations: [
+    { source: 'docker-update-checker', label: 'Container Updates', visible: true }
+  ]
+}
 
 function App() {
   const [tasks, setTasks] = useState([])
   const [tags, setTags] = useState([])
+  const [sources, setSources] = useState([])
+  const [activeTab, setActiveTab] = useState('main')
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [settings, setSettings] = useState(() => {
@@ -58,6 +66,7 @@ function App() {
     setError(null)
     fetchTasks()
     fetchTags()
+    fetchSources()
   }
 
   // Apply theme on mount and when theme changes
@@ -95,12 +104,26 @@ function App() {
     }
   }
 
-  const fetchTasks = async (params = {}) => {
+  const integrations = settings.integrations ?? DEFAULT_SETTINGS.integrations
+  const visibleIntegrations = useMemo(
+    () => integrations.filter(i => i.visible !== false && sources.includes(i.source)),
+    [integrations, sources]
+  )
+
+  const fetchTasks = async () => {
     setLoading(true)
     setError(null)
     try {
-      const queryString = new URLSearchParams(params).toString()
-      const response = await apiFetch(`${API_BASE}/tasks?${queryString}`)
+      const params = new URLSearchParams()
+      if (activeTab === 'main') {
+        // Keep integration tasks out of the main list
+        integrations
+          .filter(i => i.visible !== false && sources.includes(i.source))
+          .forEach(i => params.append('exclude_source', i.source))
+      } else {
+        params.set('source', activeTab)
+      }
+      const response = await apiFetch(`${API_BASE}/tasks?${params.toString()}`)
       if (!response.ok) {
         throw new Error('Failed to fetch tasks')
       }
@@ -111,6 +134,23 @@ function App() {
     } finally {
       setLoading(false)
     }
+  }
+
+  const fetchSources = async () => {
+    try {
+      const response = await apiFetch(`${API_BASE}/tasks/sources`)
+      if (!response.ok) {
+        throw new Error('Failed to fetch task sources')
+      }
+      const data = await response.json()
+      setSources(data.sources || [])
+    } catch (err) {
+      setError(err.message)
+    }
+  }
+
+  const refreshData = async () => {
+    await Promise.all([fetchTasks(), fetchSources()])
   }
 
   const fetchTags = async () => {
@@ -127,9 +167,28 @@ function App() {
   }
 
   useEffect(() => {
-    fetchTasks()
+    fetchSources()
     fetchTags()
   }, [])
+
+  // Refetch when the active view changes or when the set of integration
+  // sources changes (a new integration's tasks must leave the main list).
+  // Keyed on the serialized values so a routine refresh that changes
+  // nothing does not trigger an extra fetch.
+  const sourcesKey = JSON.stringify(sources)
+  const integrationsKey = JSON.stringify(integrations)
+  useEffect(() => {
+    fetchTasks()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeTab, sourcesKey, integrationsKey])
+
+  // If the active tab's integration disappears (hidden or all its tasks
+  // removed), fall back to the main list
+  useEffect(() => {
+    if (activeTab !== 'main' && !visibleIntegrations.some(i => i.source === activeTab)) {
+      setActiveTab('main')
+    }
+  }, [activeTab, visibleIntegrations])
 
   const createTask = async (taskData, source = 'gui') => {
     try {
@@ -146,7 +205,7 @@ function App() {
         throw new Error(errorData.detail || 'Failed to create task')
       }
       const newTask = await response.json()
-      await fetchTasks()
+      await refreshData()
       return newTask
     } catch (err) {
       setError(err.message)
@@ -167,7 +226,7 @@ function App() {
         const errorData = await response.json()
         throw new Error(errorData.detail || 'Failed to update task')
       }
-      await fetchTasks()
+      await refreshData()
       return await response.json()
     } catch (err) {
       setError(err.message)
@@ -184,7 +243,7 @@ function App() {
         const errorData = await response.json()
         throw new Error(errorData.detail || 'Failed to delete task')
       }
-      await fetchTasks()
+      await refreshData()
     } catch (err) {
       setError(err.message)
       throw err
@@ -200,7 +259,7 @@ function App() {
         const errorData = await response.json()
         throw new Error(errorData.detail || 'Failed to complete task')
       }
-      await fetchTasks()
+      await refreshData()
       return await response.json()
     } catch (err) {
       setError(err.message)
@@ -220,7 +279,7 @@ function App() {
           {appVersion && <span className="version-badge">v{appVersion}</span>}
         </div>
         <div className="header-actions">
-          <Settings settings={settings} onChange={handleSettingsChange} />
+          <Settings settings={settings} onChange={handleSettingsChange} sources={sources} />
           <button
             className="theme-toggle"
             onClick={toggleTheme}
@@ -243,6 +302,26 @@ function App() {
         {error && <div className="error-banner">{error}</div>}
       </header>
 
+      {visibleIntegrations.length > 0 && (
+        <nav className="view-tabs" aria-label="Task views">
+          <button
+            className={`view-tab ${activeTab === 'main' ? 'active' : ''}`}
+            onClick={() => setActiveTab('main')}
+          >
+            Tasks
+          </button>
+          {visibleIntegrations.map(integration => (
+            <button
+              key={integration.source}
+              className={`view-tab ${activeTab === integration.source ? 'active' : ''}`}
+              onClick={() => setActiveTab(integration.source)}
+            >
+              {integration.label || integration.source}
+            </button>
+          ))}
+        </nav>
+      )}
+
       <main className="app-main">
         <Routes>
           <Route
@@ -252,11 +331,12 @@ function App() {
                 tasks={tasks}
                 tags={tags}
                 loading={loading}
+                readOnly={activeTab !== 'main'}
                 onCreateTask={createTask}
                 onUpdateTask={updateTask}
                 onDeleteTask={deleteTask}
                 onCompleteTask={completeTask}
-                onRefresh={fetchTasks}
+                onRefresh={refreshData}
                 onViewTask={(task) => navigate(`/tasks/${task.id}`)}
                 refreshInterval={settings.refreshInterval}
               />

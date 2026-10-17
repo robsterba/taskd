@@ -94,3 +94,41 @@
   color: var(--text-primary);
   cursor: pointer;
 }
+
+.integration-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.integration-row input[type="text"] {
+  flex: 1;
+  min-width: 120px;
+  padding: 6px 10px;
+  font-size: 0.9rem;
+}
+
+.settings-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  font-weight: 400;
+  color: var(--text-primary);
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.integration-source {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.integration-remove {
+  font-size: 0.8rem;
+}
+
+.integration-add input[type="text"] {
+  flex: 1;
+}

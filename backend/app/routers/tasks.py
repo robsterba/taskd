@@ -7,11 +7,12 @@ from sqlalchemy.orm import Session
 from ..database import get_db
 from ..schemas import (
     TaskCreate, TaskUpdate, TaskResponse, TaskDetailResponse,
-    TaskListResponse, TaskChangeResponse
+    TaskListResponse, TaskChangeResponse, TaskSourcesResponse
 )
 from ..services.task_service import (
     create_task, get_task, list_tasks, update_task, delete_task,
-    complete_task, get_changed_tasks, get_task_detail_response
+    complete_task, get_changed_tasks, get_task_detail_response,
+    get_task_sources
 )
 from ..services.tag_service import get_or_create_tags
 from ..models import Task
@@ -25,6 +26,8 @@ def list_tasks_endpoint(
     status: Optional[str] = Query(None, description="Filter by status"),
     priority: Optional[str] = Query(None, description="Filter by priority"),
     tag: Optional[List[str]] = Query(None, description="Filter by tag names (AND logic)"),
+    source: Optional[str] = Query(None, description="Filter by creation source"),
+    exclude_source: Optional[List[str]] = Query(None, description="Exclude tasks with these creation sources"),
     parent: Optional[str] = Query(None, description="'none' for top-level only, or task ID for subtasks"),
     due_before: Optional[datetime] = Query(None, description="Filter tasks due before this date"),
     due_after: Optional[datetime] = Query(None, description="Filter tasks due after this date"),
@@ -39,6 +42,8 @@ def list_tasks_endpoint(
         status=status,
         priority=priority,
         tag=tag,
+        source=source,
+        exclude_source=exclude_source,
         parent=parent,
         due_before=due_before,
         due_after=due_after,
@@ -105,7 +110,14 @@ def create_task_endpoint(
         raise HTTPException(status_code=422, detail=str(e))
 
 
-# GET /tasks/changed must come before GET /tasks/{task_id} for proper routing
+# GET /tasks/changed and /tasks/sources must come before GET /tasks/{task_id}
+# for proper routing
+@router.get("/tasks/sources", response_model=TaskSourcesResponse)
+def get_task_sources_endpoint(db: Session = Depends(get_db)):
+    """Distinct task creation sources, for GUI integration view discovery."""
+    return TaskSourcesResponse(sources=get_task_sources(db))
+
+
 @router.get("/tasks/changed", response_model=TaskChangeResponse)
 def get_changed_tasks_endpoint(
     since: datetime = Query(..., description="ISO datetime to filter from"),

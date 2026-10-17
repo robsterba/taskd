@@ -150,6 +150,8 @@ def list_tasks(
     status: Optional[str] = None,
     priority: Optional[str] = None,
     tag: Optional[List[str]] = None,
+    source: Optional[str] = None,
+    exclude_source: Optional[List[str]] = None,
     parent: Optional[str] = None,
     due_before: Optional[datetime] = None,
     due_after: Optional[datetime] = None,
@@ -160,12 +162,14 @@ def list_tasks(
 ) -> Tuple[List[Task], int]:
     """
     List tasks with filtering and pagination.
-    
+
     Args:
         db: Database session
         status: Filter by status
         priority: Filter by priority
         tag: List of tag names to filter by (AND logic)
+        source: Filter by creation source
+        exclude_source: List of sources to exclude from the result
         parent: 'none' for top-level only, or a task ID for subtasks
         due_before: Filter tasks due before this date
         due_after: Filter tasks due after this date
@@ -173,7 +177,7 @@ def list_tasks(
         sort: Field to sort by (prefix '-' for descending)
         limit: Max results per page
         offset: Page offset
-    
+
     Returns:
         Tuple of (tasks, total_count)
     """
@@ -187,6 +191,12 @@ def list_tasks(
     
     if priority:
         filters.append(Task.priority == priority)
+
+    if source:
+        filters.append(Task.source == source)
+
+    if exclude_source:
+        filters.append(Task.source.notin_(exclude_source))
     
     if parent == "none":
         filters.append(Task.parent_task_id.is_(None))
@@ -284,6 +294,18 @@ def list_tasks(
     tasks = query.offset(offset).limit(limit).all()
     
     return tasks, total
+
+
+def get_task_sources(db: Session) -> List[str]:
+    """
+    Distinct task creation sources, alphabetically ordered.
+
+    Used by the GUI to discover which integrations (e.g.
+    docker-update-checker) have created tasks, without scanning the
+    full task list.
+    """
+    rows = db.query(Task.source).distinct().order_by(asc(Task.source)).all()
+    return [row[0] for row in rows if row[0]]
 
 
 def sync_parent_status(db: Session, parent_task_id: str) -> Optional[Task]:

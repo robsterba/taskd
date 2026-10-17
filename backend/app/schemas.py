@@ -125,6 +125,11 @@ class TaskChangeResponse(BaseModel):
     since: datetime
 
 
+# Distinct task sources (for GUI integration view discovery)
+class TaskSourcesResponse(BaseModel):
+    sources: List[str]
+
+
 # Health check response
 class HealthResponse(BaseModel):
     status: str

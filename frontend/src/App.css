@@ -55,3 +55,32 @@
     opacity: 1;
   }
 }
+
+/* View tabs: main list vs integration views (e.g. container updates) */
+.view-tabs {
+  display: flex;
+  gap: 4px;
+  padding: 8px 0 0;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.view-tab {
+  padding: 8px 16px;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+}
+
+.view-tab:hover {
+  color: var(--text-primary);
+  background: var(--bg-surface-alt);
+}
+
+.view-tab.active {
+  color: var(--accent);
+  font-weight: 500;
+  border-bottom-color: var(--accent);
+}
