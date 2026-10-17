@@ -186,6 +186,7 @@ When creating tasks from n8n workflows:
 - Always include `"source": "n8n"` (or your workflow name) to identify automated tasks
 - Use the `"tags": ["automated", ...]` pattern to make automation tasks filterable in the GUI
 - Tag by workflow purpose: `"backup"`, `"monitoring"`, `"alert"`, etc.
+- To give an n8n workflow its own GUI tab (out of the main list), add its `source` under Settings, see [Integration Views](#integration-views)
 
 ### Example: Creating Tasks
 
