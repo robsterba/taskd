@@ -135,7 +135,6 @@ function TaskList({
   tasks,
   tags,
   loading,
-  readOnly = false,
   onCreateTask,
   onUpdateTask,
   onRefresh,
@@ -275,16 +274,14 @@ function TaskList({
   return (
     <div className="task-list">
       <div className="task-list-header">
-        {!readOnly && (
-          <input
-            type="text"
-            placeholder="Quick add task... (#tag !priority)"
-            value={quickAdd}
-            onChange={(e) => setQuickAdd(e.target.value)}
-            onKeyDown={handleQuickAdd}
-            className="quick-add-input"
-          />
-        )}
+        <input
+          type="text"
+          placeholder="Quick add task... (#tag !priority)"
+          value={quickAdd}
+          onChange={(e) => setQuickAdd(e.target.value)}
+          onKeyDown={handleQuickAdd}
+          className="quick-add-input"
+        />
 
         <div className="task-list-controls">
           <button
@@ -416,9 +413,7 @@ function TaskList({
         <>
           {taskCount === 0 ? (
             <div className="empty-state">
-              <p>{readOnly
-                ? 'No integration tasks right now. They appear here once the integration creates them.'
-                : 'No tasks found. Add one using the input above!'}</p>
+              <p>No tasks found. Add one using the input above!</p>
             </div>
           ) : (
             <div className="tasks-container">

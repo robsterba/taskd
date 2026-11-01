@@ -43,7 +43,7 @@ A lightweight, self-hosted task management application with REST API and web GUI
 - **Filtering**: Filter by status, priority, tag, due date, or search text
 - **Sorting**: Sort by created, updated, due date, priority, or name
 - **Web GUI**: Responsive React frontend served from the same container
-- **Integration Views**: Tasks created by integrations (e.g. docker-update-checker) get their own GUI tab instead of cluttering the main list
+- **Integration Views**: Tasks created by integrations (e.g. docker-update-checker) get their own read-oriented GUI tab — summary strip, search, and one collapsible card per host — instead of cluttering the main list
 - **API**: Full REST API with OpenAPI documentation at `/docs`
 - **Home Assistant**: Native to-do list integration via [ha-taskd](https://github.com/robsterba/ha-taskd)
 - **n8n**: API endpoints purpose-built for workflow automation
@@ -59,7 +59,9 @@ The GUI supports a light theme and two dark themes. Click the theme toggle butto
 
 ### Integration Views
 
-Tasks created by integrations such as [docker-update-checker](https://github.com/robsterba/docker-update-checker) appear in their own tab in the GUI instead of the main task list. A tab appears automatically once the integration has created at least one task (integrations are identified by the `source` field they send when creating tasks; `docker-update-checker` is preconfigured). Manage the tabs in Settings: rename them, hide them (their tasks move back into the main list), or add new ones for any other `source`. Integration views are read-oriented — the quick-add input is hidden, but filtering, sorting, and status changes still work, and tasks open in the normal detail view.
+Tasks created by integrations such as [docker-update-checker](https://github.com/robsterba/docker-update-checker) appear in their own tab in the GUI instead of the main task list. A tab appears automatically once the integration has created at least one task (integrations are identified by the `source` field they send when creating tasks; `docker-update-checker` is preconfigured). Manage the tabs in Settings: rename them, hide them (their tasks move back into the main list), or add new ones for any other `source`.
+
+Integration views are read-oriented. Instead of the generic filter panel they show a summary strip (pending / done / group counts), a search box, and status and sort controls; the quick-add input is hidden. Tasks with subtasks render as one collapsible card per parent task with the full subtask checklist — every row opens the normal detail view, and its checkbox changes the status. The Container Updates view additionally recognizes docker-update-checker's structure: one host card per `Container updates: <host>` task, one row per `Update <image>` subtask, a per-host pending count, and image digests shown shortened with click-to-copy on the detail page.
 
 ## Quick Start
 

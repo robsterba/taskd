@@ -477,3 +477,50 @@
   font-size: 0.95rem;
   resize: vertical;
 }
+
+/* Key: value description grid (e.g. image details from docker-update-checker) */
+.kv-grid {
+  margin: 0;
+}
+
+.kv-row {
+  display: flex;
+  gap: 12px;
+  padding: 6px 0;
+}
+
+.kv-row + .kv-row {
+  border-top: 1px dashed var(--border-subtle);
+}
+
+.kv-row dt {
+  flex: 0 0 140px;
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.kv-row dd {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--text-primary);
+  overflow-wrap: anywhere;
+}
+
+.kv-digest {
+  cursor: pointer;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  background: var(--bg-inset);
+  border-radius: 6px;
+  padding: 2px 8px;
+}
+
+.kv-digest:hover {
+  background: var(--bg-surface-alt);
+}
+
+.kv-copied {
+  margin-left: 8px;
+  color: var(--success);
+  font-size: 0.75rem;
+}

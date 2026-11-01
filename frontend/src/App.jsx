@@ -3,6 +3,7 @@ import { Routes, Route, useNavigate } from 'react-router-dom'
 import TaskList from './pages/TaskList'
 import TaskDetail from './pages/TaskDetail'
 import NotFound from './pages/NotFound'
+import IntegrationView from './pages/IntegrationView'
 import Settings from './components/Settings'
 import Login from './components/Login'
 import { apiFetch, UNAUTHORIZED_EVENT } from './utils/api'
@@ -10,6 +11,7 @@ import './App.css'
 import './index.css'
 import './pages/TaskList.css'
 import './pages/TaskDetail.css'
+import './pages/IntegrationView.css'
 import './pages/NotFound.css'
 import './components/Login.css'
 
@@ -26,6 +28,7 @@ function App() {
   const [tasks, setTasks] = useState([])
   const [tags, setTags] = useState([])
   const [sources, setSources] = useState([])
+  const [truncated, setTruncated] = useState(false)
   const [activeTab, setActiveTab] = useState('main')
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
@@ -122,6 +125,9 @@ function App() {
           .forEach(i => params.append('exclude_source', i.source))
       } else {
         params.set('source', activeTab)
+        // Integration views render every task the integration created;
+        // pull the maximum the API allows so busy setups are not cut off
+        params.set('limit', '500')
       }
       const response = await apiFetch(`${API_BASE}/tasks?${params.toString()}`)
       if (!response.ok) {
@@ -129,6 +135,7 @@ function App() {
       }
       const data = await response.json()
       setTasks(data.tasks || [])
+      setTruncated((data.total || 0) > (data.tasks || []).length)
     } catch (err) {
       setError(err.message)
     } finally {
@@ -327,19 +334,33 @@ function App() {
           <Route
             path="/"
             element={
-              <TaskList
-                tasks={tasks}
-                tags={tags}
-                loading={loading}
-                readOnly={activeTab !== 'main'}
-                onCreateTask={createTask}
-                onUpdateTask={updateTask}
-                onDeleteTask={deleteTask}
-                onCompleteTask={completeTask}
-                onRefresh={refreshData}
-                onViewTask={(task) => navigate(`/tasks/${task.id}`)}
-                refreshInterval={settings.refreshInterval}
-              />
+              activeTab === 'main' ? (
+                <TaskList
+                  tasks={tasks}
+                  tags={tags}
+                  loading={loading}
+                  onCreateTask={createTask}
+                  onUpdateTask={updateTask}
+                  onDeleteTask={deleteTask}
+                  onCompleteTask={completeTask}
+                  onRefresh={refreshData}
+                  onViewTask={(task) => navigate(`/tasks/${task.id}`)}
+                  refreshInterval={settings.refreshInterval}
+                />
+              ) : (
+                <IntegrationView
+                  source={activeTab}
+                  label={visibleIntegrations.find(i => i.source === activeTab)?.label || activeTab}
+                  tasks={tasks}
+                  tags={tags}
+                  loading={loading}
+                  truncated={truncated}
+                  onUpdateTask={updateTask}
+                  onRefresh={refreshData}
+                  onViewTask={(task) => navigate(`/tasks/${task.id}`)}
+                  refreshInterval={settings.refreshInterval}
+                />
+              )
             }
           />
           <Route

@@ -48,6 +48,28 @@ const priorityOptions = [
   { value: 'urgent', label: 'Urgent' }
 ]
 
+// Descriptions made up entirely of "Key: value" lines — the format
+// docker-update-checker writes for image details — render as a
+// definition grid instead of markdown paragraphs.
+const KEY_VALUE_LINE = /^([A-Za-z][A-Za-z0-9 _/-]*):\s*(.+)$/
+
+const parseKeyValueDescription = (description) => {
+  if (!description) return null
+  const lines = description.split('\n').map(l => l.trim()).filter(Boolean)
+  if (lines.length < 2) return null
+  const pairs = []
+  for (const line of lines) {
+    const match = line.match(KEY_VALUE_LINE)
+    if (!match) return null
+    pairs.push([match[1], match[2]])
+  }
+  return pairs
+}
+
+const isDigestValue = (value) => /^(sha256:)?[0-9a-f]{20,}$/i.test(value)
+
+const shortenDigest = (value) => `${value.slice(0, 19)}…`
+
 const isOverdue = (dueDate) => {
   if (!dueDate) return false
   const now = new Date()
@@ -97,8 +119,46 @@ function TaskDetail({
   const [newSubtask, setNewSubtask] = useState('')
   const [newTagName, setNewTagName] = useState('')
   const [loading, setLoading] = useState(false)
+  const [copiedKey, setCopiedKey] = useState(null)
 
   const API_BASE = '/api/v1'
+
+  const handleCopy = useCallback(async (key, value) => {
+    try {
+      await navigator.clipboard.writeText(value)
+      setCopiedKey(key)
+      setTimeout(() => setCopiedKey(null), 1500)
+    } catch (err) {
+      console.error('Failed to copy to clipboard:', err)
+    }
+  }, [])
+
+  const renderDescription = (description) => {
+    const pairs = parseKeyValueDescription(description)
+    if (!pairs) {
+      return <ReactMarkdown>{description}</ReactMarkdown>
+    }
+    return (
+      <dl className="kv-grid">
+        {pairs.map(([key, value]) => {
+          const digest = isDigestValue(value)
+          return (
+            <div key={key} className="kv-row">
+              <dt>{key}</dt>
+              <dd
+                className={digest ? 'kv-digest' : undefined}
+                title={digest ? value : undefined}
+                onClick={digest ? () => handleCopy(key, value) : undefined}
+              >
+                {digest ? shortenDigest(value) : value}
+                {copiedKey === key && <span className="kv-copied">Copied</span>}
+              </dd>
+            </div>
+          )
+        })}
+      </dl>
+    )
+  }
 
   // Fetch full task details
   useEffect(() => {
@@ -357,7 +417,7 @@ function TaskDetail({
           ) : (
             <div className="task-description markdown">
               {task.description ? (
-                <ReactMarkdown>{task.description}</ReactMarkdown>
+                renderDescription(task.description)
               ) : (
                 <p className="no-description">No description</p>
               )}
