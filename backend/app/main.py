@@ -1,6 +1,8 @@
 """Main FastAPI application for taskd."""
 
 import os
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI, Request, HTTPException, Depends
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse
@@ -15,6 +17,17 @@ from .routers.system import router as system_router
 from .services.webhook_service import start_worker, stop_worker
 from .version import get_version
 
+
+# Initialize database and start the webhook delivery worker on startup,
+# stop the worker on shutdown
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    init_db()
+    start_worker()
+    yield
+    stop_worker()
+
+
 # Create FastAPI app
 app = FastAPI(
     title="taskd",
@@ -23,6 +36,7 @@ app = FastAPI(
     docs_url="/docs",
     redoc_url="/redoc",
     openapi_url="/api/v1/openapi.json",
+    lifespan=lifespan,
 )
 
 
@@ -37,20 +51,6 @@ app.include_router(system_router)
 app.include_router(tasks_router, dependencies=[Depends(require_api_key)])
 app.include_router(tags_router, dependencies=[Depends(require_api_key)])
 app.include_router(webhooks_router, dependencies=[Depends(require_api_key)])
-
-
-# Initialize database and start the webhook delivery worker on startup
-@app.on_event("startup")
-def startup_event():
-    """Initialize database on application startup."""
-    init_db()
-    start_worker()
-
-
-@app.on_event("shutdown")
-def shutdown_event():
-    """Stop the webhook delivery worker on shutdown."""
-    stop_worker()
 
 
 # Serve static files for React frontend

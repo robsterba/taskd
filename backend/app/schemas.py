@@ -3,7 +3,7 @@
 from datetime import datetime
 from typing import Optional, List
 from enum import Enum
-from pydantic import BaseModel, Field, ConfigDict, field_validator
+from pydantic import BaseModel, Field, ConfigDict, field_serializer, field_validator
 
 
 # Enums matching the database enums
@@ -118,14 +118,14 @@ class TaskResponse(TaskBase):
     created_at: datetime
     updated_at: datetime
 
-    model_config = ConfigDict(
-        from_attributes=True,
-        json_encoders={
-            datetime: lambda dt: dt.isoformat() + "Z"
-            if dt.tzinfo is None
-            else dt.isoformat()
-        },
-    )
+    model_config = ConfigDict(from_attributes=True)
+
+    @field_serializer("due_date", "created_at", "updated_at")
+    def serialize_datetime(self, dt):
+        """Render datetimes as ISO 8601 with a Z suffix when naive (UTC)."""
+        if dt is None:
+            return None
+        return dt.isoformat() + "Z" if dt.tzinfo is None else dt.isoformat()
 
 
 class TaskDetailResponse(TaskResponse):
