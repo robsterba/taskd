@@ -4,6 +4,7 @@ Reproduces the n8n race where two sessions both fail the existence
 check and both attempt to INSERT the same tag name. The loser must
 resolve to the winner's row instead of raising IntegrityError.
 """
+
 import threading
 
 import pytest

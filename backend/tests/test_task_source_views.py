@@ -38,9 +38,7 @@ def names(response):
 
 def test_source_filter_returns_only_that_source(client):
     seed_tasks(client)
-    response = client.get(
-        "/api/v1/tasks", params={"source": "docker-update-checker"}
-    )
+    response = client.get("/api/v1/tasks", params={"source": "docker-update-checker"})
     assert response.status_code == 200
     assert names(response) == ["update parent", "update subtask"]
     assert response.json()["total"] == 2

@@ -1,4 +1,5 @@
 """Tests for optional API key authentication (TASKD_API_KEY)."""
+
 import asyncio
 
 import pytest
@@ -24,9 +25,7 @@ def test_requests_rejected_with_wrong_key(auth_client):
 
 
 def test_requests_accepted_with_correct_key(auth_client):
-    res = auth_client.get(
-        "/api/v1/tasks", headers={"X-API-Key": "test-secret-123"}
-    )
+    res = auth_client.get("/api/v1/tasks", headers={"X-API-Key": "test-secret-123"})
     assert res.status_code == 200
     assert res.json()["tasks"] == []
 

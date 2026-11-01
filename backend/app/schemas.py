@@ -1,9 +1,9 @@
 """Pydantic schemas for request/response validation."""
-from datetime import datetime, timezone
+
+from datetime import datetime
 from typing import Optional, List
 from enum import Enum
 from pydantic import BaseModel, Field, ConfigDict, field_validator
-import uuid
 
 
 # Enums matching the database enums
@@ -47,16 +47,18 @@ class TagResponse(TagBase):
     created_at: datetime
     updated_at: datetime
     task_count: int = 0
-    
+
     model_config = ConfigDict(from_attributes=True)
 
 
 # Recurrence schema
 class RecurrenceRule(BaseModel):
     interval: RecurrenceInterval = Field(..., description="Recurrence interval type")
-    interval_count: int = Field(default=1, ge=1, le=365, description="Interval count (e.g., every 2 weeks)")
-    
-    @field_validator('interval_count')
+    interval_count: int = Field(
+        default=1, ge=1, le=365, description="Interval count (e.g., every 2 weeks)"
+    )
+
+    @field_validator("interval_count")
     @classmethod
     def validate_interval_count(cls, v):
         if v < 1:
@@ -69,18 +71,34 @@ class RecurrenceRule(BaseModel):
 # Task schemas
 class TaskBase(BaseModel):
     name: str = Field(..., min_length=1, max_length=500, description="Task name/title")
-    description: Optional[str] = Field(None, description="Task description (supports markdown)")
-    status: Optional[TaskStatus] = Field(default=TaskStatus.todo, description="Task status")
-    priority: Optional[TaskPriority] = Field(default=TaskPriority.medium, description="Task priority")
-    due_date: Optional[datetime] = Field(None, description="Due date in ISO 8601 format (UTC)")
+    description: Optional[str] = Field(
+        None, description="Task description (supports markdown)"
+    )
+    status: Optional[TaskStatus] = Field(
+        default=TaskStatus.todo, description="Task status"
+    )
+    priority: Optional[TaskPriority] = Field(
+        default=TaskPriority.medium, description="Task priority"
+    )
+    due_date: Optional[datetime] = Field(
+        None, description="Due date in ISO 8601 format (UTC)"
+    )
     recurrence: Optional[RecurrenceRule] = Field(None, description="Recurrence rule")
-    parent_task_id: Optional[str] = Field(None, description="Parent task ID for subtasks")
-    tags: Optional[List[str]] = Field(default_factory=list, description="List of tag names")
-    source: Optional[str] = Field(default="api", max_length=50, description="Source of task creation")
+    parent_task_id: Optional[str] = Field(
+        None, description="Parent task ID for subtasks"
+    )
+    tags: Optional[List[str]] = Field(
+        default_factory=list, description="List of tag names"
+    )
+    source: Optional[str] = Field(
+        default="api", max_length=50, description="Source of task creation"
+    )
 
 
 class TaskCreate(TaskBase):
-    subtasks: Optional[List[str]] = Field(default_factory=list, description="List of subtask names")
+    subtasks: Optional[List[str]] = Field(
+        default_factory=list, description="List of subtask names"
+    )
 
 
 class TaskUpdate(BaseModel):
@@ -99,15 +117,20 @@ class TaskResponse(TaskBase):
     id: str
     created_at: datetime
     updated_at: datetime
-    
-    model_config = ConfigDict(from_attributes=True, json_encoders={
-        datetime: lambda dt: dt.isoformat() + "Z" if dt.tzinfo is None else dt.isoformat()
-    })
+
+    model_config = ConfigDict(
+        from_attributes=True,
+        json_encoders={
+            datetime: lambda dt: dt.isoformat() + "Z"
+            if dt.tzinfo is None
+            else dt.isoformat()
+        },
+    )
 
 
 class TaskDetailResponse(TaskResponse):
     subtasks: List["TaskResponse"] = []
-    
+
     model_config = ConfigDict(from_attributes=True)
 
 
@@ -152,9 +175,18 @@ ALLOWED_WEBHOOK_EVENTS = [
 
 
 class WebhookCreate(BaseModel):
-    url: str = Field(..., min_length=1, max_length=2048, description="Callback URL (http/https)")
-    events: List[str] = Field(..., min_length=1, description="Event types to subscribe to")
-    secret: Optional[str] = Field(None, min_length=8, max_length=128, description="HMAC secret; generated if omitted")
+    url: str = Field(
+        ..., min_length=1, max_length=2048, description="Callback URL (http/https)"
+    )
+    events: List[str] = Field(
+        ..., min_length=1, description="Event types to subscribe to"
+    )
+    secret: Optional[str] = Field(
+        None,
+        min_length=8,
+        max_length=128,
+        description="HMAC secret; generated if omitted",
+    )
     active: bool = Field(True, description="Whether the webhook is active")
 
     @field_validator("url")
@@ -169,7 +201,9 @@ class WebhookCreate(BaseModel):
     def validate_events(cls, v):
         invalid = [e for e in v if e not in ALLOWED_WEBHOOK_EVENTS]
         if invalid:
-            raise ValueError(f"Unknown event types: {', '.join(invalid)}. Allowed: {', '.join(ALLOWED_WEBHOOK_EVENTS)}")
+            raise ValueError(
+                f"Unknown event types: {', '.join(invalid)}. Allowed: {', '.join(ALLOWED_WEBHOOK_EVENTS)}"
+            )
         return v
 
 
@@ -192,7 +226,9 @@ class WebhookUpdate(BaseModel):
         if v is not None:
             invalid = [e for e in v if e not in ALLOWED_WEBHOOK_EVENTS]
             if invalid:
-                raise ValueError(f"Unknown event types: {', '.join(invalid)}. Allowed: {', '.join(ALLOWED_WEBHOOK_EVENTS)}")
+                raise ValueError(
+                    f"Unknown event types: {', '.join(invalid)}. Allowed: {', '.join(ALLOWED_WEBHOOK_EVENTS)}"
+                )
         return v
 
 

@@ -4,6 +4,7 @@ Opt-in: when the TASKD_API_KEY environment variable is set, all API
 endpoints (except health and version) require it in the X-API-Key
 header. When unset, the app behaves as before with no authentication.
 """
+
 import os
 import secrets
 

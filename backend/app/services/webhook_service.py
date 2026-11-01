@@ -4,6 +4,7 @@ Events are enqueued by the task service after commit and delivered by a
 background worker thread: HTTP POST with HMAC-SHA256 signature, up to
 MAX_ATTEMPTS attempts, each attempt recorded in the webhook_deliveries table.
 """
+
 import hmac
 import hashlib
 import json
@@ -44,7 +45,9 @@ def sign_payload(secret: str, body: bytes) -> str:
     return hmac.new(secret.encode("utf-8"), body, hashlib.sha256).hexdigest()
 
 
-def dispatch_event(db: Session, event_type: str, task_payload: dict, task_id: Optional[str] = None) -> None:
+def dispatch_event(
+    db: Session, event_type: str, task_payload: dict, task_id: Optional[str] = None
+) -> None:
     """Queue deliveries of an event to all active webhooks subscribed to it.
 
     Called after the database commit so payloads reflect durable state.
@@ -55,17 +58,19 @@ def dispatch_event(db: Session, event_type: str, task_payload: dict, task_id: Op
         return
 
     for webhook in matching:
-        _job_queue.put({
-            "webhook_id": webhook.id,
-            "url": webhook.url,
-            "secret": webhook.secret,
-            "payload": {
-                "event": event_type,
-                "timestamp": datetime.now(timezone.utc).isoformat(),
-                "task": task_payload,
-            },
-            "task_id": task_id,
-        })
+        _job_queue.put(
+            {
+                "webhook_id": webhook.id,
+                "url": webhook.url,
+                "secret": webhook.secret,
+                "payload": {
+                    "event": event_type,
+                    "timestamp": datetime.now(timezone.utc).isoformat(),
+                    "task": task_payload,
+                },
+                "task_id": task_id,
+            }
+        )
 
 
 def _send_webhook(url: str, secret: str, body: bytes) -> Optional[int]:
@@ -86,17 +91,25 @@ def _send_webhook(url: str, secret: str, body: bytes) -> Optional[int]:
         return None
 
 
-def _record_delivery(session: Session, job: dict, status: str, response_code: Optional[int], attempts: int) -> None:
+def _record_delivery(
+    session: Session,
+    job: dict,
+    status: str,
+    response_code: Optional[int],
+    attempts: int,
+) -> None:
     """Persist a delivery attempt result and prune the per-webhook log."""
-    session.add(WebhookDelivery(
-        webhook_id=job["webhook_id"],
-        event_type=job["payload"]["event"],
-        task_id=job["task_id"],
-        status=status,
-        response_code=response_code,
-        attempts=attempts,
-        created_at=datetime.now(timezone.utc),
-    ))
+    session.add(
+        WebhookDelivery(
+            webhook_id=job["webhook_id"],
+            event_type=job["payload"]["event"],
+            task_id=job["task_id"],
+            status=status,
+            response_code=response_code,
+            attempts=attempts,
+            created_at=datetime.now(timezone.utc),
+        )
+    )
     session.commit()
 
     # Keep only the most recent deliveries per webhook
@@ -130,7 +143,9 @@ def _deliver_job(job: dict) -> None:
 
     session = _session_factory()
     try:
-        _record_delivery(session, job, "success" if success else "failed", response_code, attempts)
+        _record_delivery(
+            session, job, "success" if success else "failed", response_code, attempts
+        )
     finally:
         session.close()
 
@@ -154,7 +169,9 @@ def start_worker() -> None:
     with _worker_lock:
         if _worker is not None and _worker.is_alive():
             return
-        _worker = threading.Thread(target=_worker_loop, name="webhook-dispatcher", daemon=True)
+        _worker = threading.Thread(
+            target=_worker_loop, name="webhook-dispatcher", daemon=True
+        )
         _worker.start()
 
 
@@ -198,10 +215,19 @@ def send_test_ping(db: Session, webhook: Webhook) -> dict:
     response_code = _send_webhook(webhook.url, webhook.secret, body)
     success = response_code is not None and 200 <= response_code < 300
 
-    _record_delivery(db, {
-        "webhook_id": webhook.id,
-        "payload": payload,
-        "task_id": None,
-    }, "success" if success else "failed", response_code, 1)
+    _record_delivery(
+        db,
+        {
+            "webhook_id": webhook.id,
+            "payload": payload,
+            "task_id": None,
+        },
+        "success" if success else "failed",
+        response_code,
+        1,
+    )
 
-    return {"status": "success" if success else "failed", "response_code": response_code}
+    return {
+        "status": "success" if success else "failed",
+        "response_code": response_code,
+    }

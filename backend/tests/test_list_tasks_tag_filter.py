@@ -59,9 +59,7 @@ def test_unknown_tag_returns_no_tasks(client):
 def test_known_and_unknown_tags_return_no_tasks(client):
     """One unknown tag in an AND filter means nothing can match."""
     seed_tasks(client)
-    response = client.get(
-        "/api/v1/tasks", params={"tag": ["alpha", "does-not-exist"]}
-    )
+    response = client.get("/api/v1/tasks", params={"tag": ["alpha", "does-not-exist"]})
     assert response.status_code == 200
     assert response.json()["tasks"] == []
     assert response.json()["total"] == 0

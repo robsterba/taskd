@@ -1,4 +1,5 @@
 """System router for unauthenticated endpoints (health, version)."""
+
 from datetime import datetime, timezone
 
 from fastapi import APIRouter
@@ -13,9 +14,7 @@ router = APIRouter(prefix="/api/v1", tags=["system"])
 def health_check():
     """Health check endpoint."""
     return HealthResponse(
-        status="ok",
-        version=get_version(),
-        timestamp=datetime.now(timezone.utc)
+        status="ok", version=get_version(), timestamp=datetime.now(timezone.utc)
     )
 
 

@@ -1,4 +1,5 @@
 """Tests for webhook registration, event dispatch, and delivery."""
+
 import hashlib
 import hmac
 import json
@@ -15,7 +16,9 @@ def isolated_dispatcher(monkeypatch):
     # Never start the real worker thread during tests
     monkeypatch.setattr("app.main.start_worker", lambda: None)
     # Worker sessions must hit the in-memory test database
-    monkeypatch.setattr(webhook_service, "_session_factory", conftest.TestingSessionLocal)
+    monkeypatch.setattr(
+        webhook_service, "_session_factory", conftest.TestingSessionLocal
+    )
     # No real HTTP, no retry delay
     monkeypatch.setattr(webhook_service, "RETRY_DELAY_SECONDS", 0.0)
     # Clear any leftover jobs from earlier tests
@@ -68,7 +71,9 @@ def test_create_webhook_with_explicit_secret(client):
 
 
 def test_create_webhook_rejects_bad_url(client):
-    response = client.post("/api/v1/webhooks", json={"url": "ftp://x", "events": ["task.created"]})
+    response = client.post(
+        "/api/v1/webhooks", json={"url": "ftp://x", "events": ["task.created"]}
+    )
     assert response.status_code == 422
 
 
@@ -110,18 +115,24 @@ def test_list_update_delete_webhook(client):
 
 def test_created_event_payload_includes_subtasks(client, capture_sends):
     register_webhook(client, events=["task.created"])
-    client.post("/api/v1/tasks", json={
-        "name": "Disk failure on pve-2",
-        "tags": ["automated", "infra"],
-        "subtasks": ["Check SMART data", "Replace drive"],
-    })
+    client.post(
+        "/api/v1/tasks",
+        json={
+            "name": "Disk failure on pve-2",
+            "tags": ["automated", "infra"],
+            "subtasks": ["Check SMART data", "Replace drive"],
+        },
+    )
     webhook_service.drain_queue()
 
     assert len(capture_sends) == 1
     payload = json.loads(capture_sends[0].body)
     assert payload["event"] == "task.created"
     assert payload["task"]["name"] == "Disk failure on pve-2"
-    assert sorted(t["name"] for t in payload["task"]["subtasks"]) == ["Check SMART data", "Replace drive"]
+    assert sorted(t["name"] for t in payload["task"]["subtasks"]) == [
+        "Check SMART data",
+        "Replace drive",
+    ]
     for subtask in payload["task"]["subtasks"]:
         assert subtask["parent_task_id"] == payload["task"]["id"]
 
@@ -136,7 +147,9 @@ def test_created_event_fires_once_for_task_with_subtasks(client, capture_sends):
 def test_created_event_for_later_subtask(client, capture_sends):
     register_webhook(client, events=["task.created"])
     parent = client.post("/api/v1/tasks", json={"name": "Parent"}).json()
-    client.post("/api/v1/tasks", json={"name": "Added later", "parent_task_id": parent["id"]})
+    client.post(
+        "/api/v1/tasks", json={"name": "Added later", "parent_task_id": parent["id"]}
+    )
     webhook_service.drain_queue()
 
     assert len(capture_sends) == 2
@@ -208,11 +221,14 @@ def test_complete_endpoint_emits_completed(client, capture_sends):
 
 
 def test_complete_recurring_emits_completed_and_created(client, capture_sends):
-    task = client.post("/api/v1/tasks", json={
-        "name": "Water plants",
-        "recurrence": {"interval": "daily", "interval_count": 1},
-        "due_date": "2026-09-28T00:00:00Z",
-    }).json()
+    task = client.post(
+        "/api/v1/tasks",
+        json={
+            "name": "Water plants",
+            "recurrence": {"interval": "daily", "interval_count": 1},
+            "due_date": "2026-09-28T00:00:00Z",
+        },
+    ).json()
     register_webhook(client, events=["task.completed", "task.created"])
     client.post(f"/api/v1/tasks/{task['id']}/complete")
     webhook_service.drain_queue()
@@ -227,7 +243,9 @@ def test_complete_recurring_emits_completed_and_created(client, capture_sends):
 
 def test_deleted_event_payload_has_subtasks(client, capture_sends):
     register_webhook(client, events=["task.deleted"])
-    task = client.post("/api/v1/tasks", json={"name": "Parent", "subtasks": ["S1", "S2"]}).json()
+    task = client.post(
+        "/api/v1/tasks", json={"name": "Parent", "subtasks": ["S1", "S2"]}
+    ).json()
     client.delete(f"/api/v1/tasks/{task['id']}")
     webhook_service.drain_queue()
 
@@ -282,7 +300,9 @@ def test_failed_delivery_retries_and_records(client, monkeypatch):
     assert len(attempts) == webhook_service.MAX_ATTEMPTS
 
     webhook_id = client.get("/api/v1/webhooks").json()["webhooks"][0]["id"]
-    deliveries = client.get(f"/api/v1/webhooks/{webhook_id}/deliveries").json()["deliveries"]
+    deliveries = client.get(f"/api/v1/webhooks/{webhook_id}/deliveries").json()[
+        "deliveries"
+    ]
     assert len(deliveries) == 1
     assert deliveries[0]["status"] == "failed"
     assert deliveries[0]["response_code"] == 500
@@ -300,7 +320,9 @@ def test_connection_failure_recorded_without_response_code(client, monkeypatch):
     webhook_service.drain_queue()
 
     webhook_id = client.get("/api/v1/webhooks").json()["webhooks"][0]["id"]
-    deliveries = client.get(f"/api/v1/webhooks/{webhook_id}/deliveries").json()["deliveries"]
+    deliveries = client.get(f"/api/v1/webhooks/{webhook_id}/deliveries").json()[
+        "deliveries"
+    ]
     assert deliveries[0]["status"] == "failed"
     assert deliveries[0]["response_code"] is None
 

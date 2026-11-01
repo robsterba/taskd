@@ -1,4 +1,5 @@
 """Test fixtures: in-memory SQLite database + FastAPI TestClient."""
+
 import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine

@@ -1,13 +1,12 @@
 """Tag router for FastAPI endpoints."""
+
 from typing import List
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
 from ..database import get_db
-from ..schemas import TagResponse, TagCreate, TagUpdate
-from ..services.tag_service import (
-    get_all_tags, get_tag_by_name, update_tag, delete_tag
-)
+from ..schemas import TagResponse, TagUpdate
+from ..services.tag_service import get_all_tags, update_tag, delete_tag
 
 router = APIRouter(prefix="/api/v1", tags=["tags"])
 
@@ -19,7 +18,9 @@ def list_tags(db: Session = Depends(get_db)):
 
 
 @router.patch("/tags/{name}", response_model=TagResponse)
-def update_tag_endpoint(name: str, update_data: TagUpdate, db: Session = Depends(get_db)):
+def update_tag_endpoint(
+    name: str, update_data: TagUpdate, db: Session = Depends(get_db)
+):
     """Rename a tag or update its color."""
     try:
         result = update_tag(db, name, update_data)

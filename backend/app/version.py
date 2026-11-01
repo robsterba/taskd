@@ -1,4 +1,5 @@
 """Application version information."""
+
 import pathlib
 
 # Candidate locations for the VERSION file:
@@ -14,7 +15,7 @@ def get_version():
     """Read version from the VERSION file. Returns '1.0.0' if not found."""
     for path in VERSION_CANDIDATES:
         try:
-            with open(path, 'r') as f:
+            with open(path, "r") as f:
                 version = f.read().strip()
                 if version:
                     return version

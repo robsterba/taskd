@@ -14,7 +14,7 @@ def create_parent_with_subtasks(client, count=2):
     subtasks = [
         client.post(
             "/api/v1/tasks",
-            json={"name": f"subtask {i}", "parent_task_id": parent["id"]}
+            json={"name": f"subtask {i}", "parent_task_id": parent["id"]},
         ).json()
         for i in range(count)
     ]

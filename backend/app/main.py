@@ -1,4 +1,5 @@
 """Main FastAPI application for taskd."""
+
 import os
 from fastapi import FastAPI, Request, HTTPException, Depends
 from fastapi.staticfiles import StaticFiles
@@ -12,7 +13,7 @@ from .routers.tags import router as tags_router
 from .routers.webhooks import router as webhooks_router
 from .routers.system import router as system_router
 from .services.webhook_service import start_worker, stop_worker
-from .version import VERSION, get_version
+from .version import get_version
 
 # Create FastAPI app
 app = FastAPI(
@@ -21,7 +22,7 @@ app = FastAPI(
     version=get_version(),
     docs_url="/docs",
     redoc_url="/redoc",
-    openapi_url="/api/v1/openapi.json"
+    openapi_url="/api/v1/openapi.json",
 )
 
 
@@ -60,6 +61,7 @@ STATIC_DIR = Path("/app/static")
 if STATIC_DIR.exists():
     app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
 
+
 # Fallback to index.html for SPA routing
 # This must come AFTER static file mounting
 @app.get("/")
@@ -75,16 +77,22 @@ async def serve_spa_root(request: Request):
 async def serve_spa(request: Request, path: str):
     """Serve the React SPA for all non-API routes."""
     # Check if the path is for API or docs
-    if path.startswith("/api") or path.startswith("/docs") or path.startswith("/redoc") or path.startswith("/openapi"):
+    if (
+        path.startswith("/api")
+        or path.startswith("/docs")
+        or path.startswith("/redoc")
+        or path.startswith("/openapi")
+    ):
         raise HTTPException(status_code=404, detail="Not found")
-    
+
     # For static assets, try to serve the file directly
     if path.startswith("/static/"):
         file_path = STATIC_DIR / path.removeprefix("/static/")
         if file_path.exists():
             from fastapi.responses import FileResponse
+
             return FileResponse(file_path)
-    
+
     # Serve index.html for all other non-API paths (SPA routing)
     index_path = STATIC_DIR / "index.html"
     if index_path.exists():
@@ -96,5 +104,6 @@ async def serve_spa(request: Request, path: str):
 
 if __name__ == "__main__":
     import uvicorn
+
     port = int(os.getenv("PORT", 8000))
     uvicorn.run(app, host="0.0.0.0", port=port)

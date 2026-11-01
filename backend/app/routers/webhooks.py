@@ -1,12 +1,16 @@
 """Webhook registration and management endpoints."""
+
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
 from ..database import get_db
 from ..models import Webhook, WebhookDelivery
 from ..schemas import (
-    WebhookCreate, WebhookUpdate, WebhookResponse,
-    WebhookListResponse, WebhookDeliveryResponse
+    WebhookCreate,
+    WebhookUpdate,
+    WebhookResponse,
+    WebhookListResponse,
+    WebhookDeliveryResponse,
 )
 from ..services.webhook_service import generate_secret, send_test_ping
 
@@ -16,7 +20,9 @@ router = APIRouter(prefix="/api/v1/webhooks", tags=["webhooks"])
 def _get_webhook_or_404(db: Session, webhook_id: str) -> Webhook:
     webhook = db.query(Webhook).filter(Webhook.id == webhook_id).first()
     if not webhook:
-        raise HTTPException(status_code=404, detail=f"Webhook with id {webhook_id} not found")
+        raise HTTPException(
+            status_code=404, detail=f"Webhook with id {webhook_id} not found"
+        )
     return webhook
 
 
@@ -24,7 +30,9 @@ def _get_webhook_or_404(db: Session, webhook_id: str) -> Webhook:
 def list_webhooks_endpoint(db: Session = Depends(get_db)):
     """List all registered webhooks."""
     webhooks = db.query(Webhook).order_by(Webhook.created_at).all()
-    return WebhookListResponse(webhooks=[WebhookResponse.model_validate(w) for w in webhooks])
+    return WebhookListResponse(
+        webhooks=[WebhookResponse.model_validate(w) for w in webhooks]
+    )
 
 
 @router.post("", response_model=WebhookResponse, status_code=201)
@@ -34,7 +42,7 @@ def create_webhook_endpoint(webhook_data: WebhookCreate, db: Session = Depends(g
         url=webhook_data.url,
         events=webhook_data.events,
         secret=webhook_data.secret or generate_secret(),
-        active=webhook_data.active
+        active=webhook_data.active,
     )
     db.add(webhook)
     db.commit()
@@ -49,7 +57,9 @@ def get_webhook_endpoint(webhook_id: str, db: Session = Depends(get_db)):
 
 
 @router.patch("/{webhook_id}", response_model=WebhookResponse)
-def update_webhook_endpoint(webhook_id: str, update_data: WebhookUpdate, db: Session = Depends(get_db)):
+def update_webhook_endpoint(
+    webhook_id: str, update_data: WebhookUpdate, db: Session = Depends(get_db)
+):
     """Update a webhook registration."""
     webhook = _get_webhook_or_404(db, webhook_id)
 
@@ -85,9 +95,7 @@ def test_webhook_endpoint(webhook_id: str, db: Session = Depends(get_db)):
 
 @router.get("/{webhook_id}/deliveries")
 def list_deliveries_endpoint(
-    webhook_id: str,
-    db: Session = Depends(get_db),
-    limit: int = 20
+    webhook_id: str, db: Session = Depends(get_db), limit: int = 20
 ):
     """List recent deliveries for a webhook, newest first."""
     _get_webhook_or_404(db, webhook_id)
@@ -99,5 +107,8 @@ def list_deliveries_endpoint(
         .all()
     )
     return {
-        "deliveries": [WebhookDeliveryResponse.model_validate(d).model_dump(mode="json") for d in deliveries]
+        "deliveries": [
+            WebhookDeliveryResponse.model_validate(d).model_dump(mode="json")
+            for d in deliveries
+        ]
     }

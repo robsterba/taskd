@@ -1,4 +1,5 @@
 """Database configuration and session management."""
+
 import os
 from sqlalchemy import create_engine, event
 from sqlalchemy.orm import declarative_base, sessionmaker
@@ -18,10 +19,9 @@ SQLALCHEMY_DATABASE_URL = f"sqlite:///{DB_PATH}"
 
 # Create engine
 engine = create_engine(
-    SQLALCHEMY_DATABASE_URL,
-    connect_args={"check_same_thread": False},
-    echo=False
+    SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False}, echo=False
 )
+
 
 # Enable foreign key support for SQLite
 # This must be done for each connection
@@ -30,6 +30,7 @@ def set_sqlite_pragma(dbapi_connection, connection_record):
     cursor = dbapi_connection.cursor()
     cursor.execute("PRAGMA foreign_keys=ON")
     cursor.close()
+
 
 # Create a configured Session class
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
