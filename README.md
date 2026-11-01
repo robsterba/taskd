@@ -34,6 +34,23 @@ A lightweight, self-hosted task management application with REST API and web GUI
 
 ![Task created by n8n automation](docs/screenshots/n8n_integration.png)
 
+**Container updates integration view (light and dark themes)**
+
+<table>
+  <tr>
+    <td width="50%" align="center">Light theme</td>
+    <td width="50%" align="center">Dark theme</td>
+  </tr>
+  <tr>
+    <td><img src="docs/screenshots/container_updates_light.png" alt="Container updates view, light theme"></td>
+    <td><img src="docs/screenshots/container_updates_dark.png" alt="Container updates view, dark theme"></td>
+  </tr>
+</table>
+
+**Image update detail** — key/value facts render as a grid, with digests shortened and click-to-copy
+
+![Image update detail](docs/screenshots/container_updates_detail.png)
+
 ## Features
 
 - **Task Management**: Create, read, update, delete tasks with full CRUD support
