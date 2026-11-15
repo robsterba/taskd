@@ -12,6 +12,13 @@ services:
     environment:
       - PORT=8000
       - DATA_DIR=/data
+      # Semaphore deployment triggers (complete a docker-update-checker
+      # update row in the GUI -> matching Semaphore job). Values come from
+      # a .env file next to this compose file; empty/absent disables the
+      # trigger integration.
+      - SEMAPHORE_URL=${SEMAPHORE_URL:-}
+      - SEMAPHORE_API_TOKEN=${SEMAPHORE_API_TOKEN:-}
+      - SEMAPHORE_HOSTS=${SEMAPHORE_HOSTS:-boxy,moxy,foxy}
       # Uncomment to require an X-API-Key header on all API endpoints
       # - TASKD_API_KEY=change-me
     healthcheck:

@@ -26,6 +26,7 @@ from ..services.task_service import (
     get_task_detail_response,
     get_task_sources,
 )
+from ..services.semaphore_service import SemaphoreTriggerError
 from ..models import Task
 
 router = APIRouter(prefix="/api/v1", tags=["tasks"])
@@ -190,10 +191,18 @@ def get_task_endpoint(task_id: str, db: Session = Depends(get_db)):
 
 @router.patch("/tasks/{task_id}", response_model=TaskResponse)
 def update_task_endpoint(
-    task_id: str, update_data: TaskUpdate, db: Session = Depends(get_db)
+    task_id: str,
+    update_data: TaskUpdate,
+    db: Session = Depends(get_db),
+    source: Optional[str] = Header(
+        None, description="Source of the request; integrations identify themselves"
+    ),
 ):
     """Partially update a task."""
-    task = update_task(db, task_id, update_data)
+    try:
+        task = update_task(db, task_id, update_data, requester_source=source)
+    except SemaphoreTriggerError as exc:
+        raise HTTPException(status_code=502, detail=str(exc))
     if not task:
         raise HTTPException(status_code=404, detail=f"Task with id {task_id} not found")
 
@@ -214,9 +223,18 @@ def update_task_endpoint(
 
 
 @router.post("/tasks/{task_id}/complete", response_model=TaskResponse)
-def complete_task_endpoint(task_id: str, db: Session = Depends(get_db)):
+def complete_task_endpoint(
+    task_id: str,
+    db: Session = Depends(get_db),
+    source: Optional[str] = Header(
+        None, description="Source of the request; integrations identify themselves"
+    ),
+):
     """Mark a task as done. If recurring, spawns next occurrence."""
-    task = complete_task(db, task_id)
+    try:
+        task = complete_task(db, task_id, requester_source=source)
+    except SemaphoreTriggerError as exc:
+        raise HTTPException(status_code=502, detail=str(exc))
     if not task:
         raise HTTPException(status_code=404, detail=f"Task with id {task_id} not found")
 

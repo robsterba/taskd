@@ -61,6 +61,7 @@ A lightweight, self-hosted task management application with REST API and web GUI
 - **Sorting**: Sort by created, updated, due date, priority, or name
 - **Web GUI**: Responsive React frontend served from the same container
 - **Integration Views**: Tasks created by integrations (e.g. docker-update-checker) get their own read-oriented GUI tab — summary strip, search, and one collapsible card per host — instead of cluttering the main list
+- **Deployment Triggers**: Completing a docker-update-checker image row fires the matching Semaphore stack-update job (per stack; host-level for the parent task). Completions by the integration itself never trigger; failures block the completion.
 - **API**: Full REST API with OpenAPI documentation at `/docs`
 - **Home Assistant**: Native to-do list integration via [ha-taskd](https://github.com/robsterba/ha-taskd)
 - **n8n**: API endpoints purpose-built for workflow automation
@@ -342,6 +343,12 @@ Environment variables:
 - `PORT` - HTTP port (default: 8000)
 - `DATA_DIR` - Database directory (default: /data)
 - `TASKD_API_KEY` - Optional API key. When set, all API endpoints (except `/health` and `/version`) require it in the `X-API-Key` header. Unset = no authentication.
+- `SEMAPHORE_URL` - Semaphore base URL (e.g. `http://192.168.1.13:3000`). With `SEMAPHORE_API_TOKEN`, enables deployment triggers: completing a docker-update-checker task from the GUI fires the matching Semaphore job instead of just marking bookkeeping.
+- `SEMAPHORE_API_TOKEN` - Semaphore bearer API token.
+- `SEMAPHORE_PROJECT` - Semaphore project id (default: 1).
+- `SEMAPHORE_HOSTS` - Hosts to trigger deployments for (default: `boxy,moxy,foxy`). Completions on other hosts pass through as plain bookkeeping.
+
+Trigger behavior: an image subtask (`Update <image>`) resolves its stacks from the `Stacks:` line docker-update-checker writes into the description, and fires one `Stack update - <host>:<stack>` template per stack; completing the host parent (`Container updates: <host>`) fires the per-host `Stack update - <host>` template. Requests carrying a `source` header equal to the task's source are exempt (that is docker-update-checker reconciling its own rows). Any trigger failure — Semaphore unreachable, template missing, no stack metadata — returns HTTP 502 and leaves the task uncompleted, so a "done" row always means the job actually fired.
 
 ## Versioning
 

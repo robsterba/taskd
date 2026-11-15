@@ -9,6 +9,7 @@ from ..models import Task, Tag, TaskTag
 from ..schemas import TaskCreate, TaskUpdate, TaskResponse, TaskDetailResponse
 from .tag_service import get_or_create_tags, normalize_tag_name
 from .webhook_service import dispatch_event
+from .semaphore_service import trigger_for_task
 from ..utils.recurrence import compute_next_due_date, should_spawn_next_occurrence
 
 
@@ -333,7 +334,12 @@ def sync_parent_status(db: Session, parent_task_id: str) -> Optional[Task]:
     return parent
 
 
-def update_task(db: Session, task_id: str, update_data: TaskUpdate) -> Optional[Task]:
+def update_task(
+    db: Session,
+    task_id: str,
+    update_data: TaskUpdate,
+    requester_source: Optional[str] = None,
+) -> Optional[Task]:
     """
     Update a task.
 
@@ -341,6 +347,9 @@ def update_task(db: Session, task_id: str, update_data: TaskUpdate) -> Optional[
         db: Database session
         task_id: Task ID
         update_data: Update data
+        requester_source: Value of the request's source header, if any.
+            Identifies integration-initiated updates (DUC reconcile),
+            which do not trigger Semaphore deployments.
 
     Returns:
         Updated Task instance or None
@@ -392,6 +401,13 @@ def update_task(db: Session, task_id: str, update_data: TaskUpdate) -> Optional[
             db.add(association)
 
     task.updated_at = datetime.now(timezone.utc)
+
+    # Completing a docker-update-checker task triggers its Semaphore
+    # deployment BEFORE the change is committed: a trigger failure
+    # (SemaphoreTriggerError, surfaced as 502) leaves the task at its
+    # previous status, so a "done" task always means the job fired.
+    if previous_status != "done" and task.status == "done":
+        trigger_for_task(db, task, requester_source)
 
     # Subtask status changes derive the parent's status while it is active
     parent_changed = None
@@ -453,13 +469,18 @@ def delete_task(db: Session, task_id: str) -> bool:
     return True
 
 
-def complete_task(db: Session, task_id: str) -> Optional[Task]:
+def complete_task(
+    db: Session, task_id: str, requester_source: Optional[str] = None
+) -> Optional[Task]:
     """
     Mark a task as done. If it's recurring, spawn the next occurrence.
 
     Args:
         db: Database session
         task_id: Task ID
+        requester_source: Value of the request's source header, if any.
+            Identifies integration-initiated completions (DUC reconcile),
+            which do not trigger Semaphore deployments.
 
     Returns:
         The original task (now marked as done)
@@ -470,6 +491,10 @@ def complete_task(db: Session, task_id: str) -> Optional[Task]:
 
     # Only update if not already done
     if task.status != "done":
+        # Completing a docker-update-checker task triggers its Semaphore
+        # deployment BEFORE the change is committed — see update_task.
+        trigger_for_task(db, task, requester_source)
+
         task.status = "done"
         task.updated_at = datetime.now(timezone.utc)
 
