@@ -3,6 +3,8 @@
 from datetime import datetime, timezone
 from typing import Optional, List
 from fastapi import APIRouter, Depends, HTTPException, Query, Header
+from fastapi.encoders import jsonable_encoder
+from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
 
 from ..database import get_db
@@ -30,6 +32,32 @@ from ..services.semaphore_service import SemaphoreTriggerError
 from ..models import Task
 
 router = APIRouter(prefix="/api/v1", tags=["tasks"])
+
+
+def latin1_safe(value: str) -> str:
+    """HTTP headers are latin-1; drop anything outside it."""
+    return value.encode("latin-1", "replace").decode("latin-1")
+
+
+def _task_json_response(task, headers=None):
+    """Serialize a task to the TaskResponse payload with extra headers."""
+    response = TaskResponse(
+        id=task.id,
+        name=task.name,
+        description=task.description,
+        status=task.status,
+        priority=task.priority,
+        due_date=task.due_date,
+        parent_task_id=task.parent_task_id,
+        recurrence=task.recurrence,
+        source=task.source,
+        tags=[tag.name for tag in task.tags] if task.tags else [],
+        created_at=task.created_at,
+        updated_at=task.updated_at,
+    )
+    return JSONResponse(
+        content=jsonable_encoder(response), headers=headers or {}, status_code=200
+    )
 
 
 @router.get("/tasks", response_model=TaskListResponse)
@@ -206,20 +234,14 @@ def update_task_endpoint(
     if not task:
         raise HTTPException(status_code=404, detail=f"Task with id {task_id} not found")
 
-    return TaskResponse(
-        id=task.id,
-        name=task.name,
-        description=task.description,
-        status=task.status,
-        priority=task.priority,
-        due_date=task.due_date,
-        parent_task_id=task.parent_task_id,
-        recurrence=task.recurrence,
-        source=task.source,
-        tags=[tag.name for tag in task.tags] if task.tags else [],
-        created_at=task.created_at,
-        updated_at=task.updated_at,
-    )
+    # Deployment-trigger summary ("Semaphore: <template> (task <id>)"), set
+    # when completing a docker-update-checker task fired a semaphore job.
+    headers = {}
+    trigger_summary = getattr(task, "_semaphore_trigger", None)
+    if trigger_summary:
+        headers["X-Semaphore-Trigger"] = latin1_safe(trigger_summary)
+
+    return _task_json_response(task, headers)
 
 
 @router.post("/tasks/{task_id}/complete", response_model=TaskResponse)
@@ -256,20 +278,12 @@ def complete_task_endpoint(
             if incomplete_subtasks > 0:
                 headers["X-Warning"] = "Parent task has incomplete subtasks"
 
-    return TaskResponse(
-        id=task.id,
-        name=task.name,
-        description=task.description,
-        status=task.status,
-        priority=task.priority,
-        due_date=task.due_date,
-        parent_task_id=task.parent_task_id,
-        recurrence=task.recurrence,
-        source=task.source,
-        tags=[tag.name for tag in task.tags] if task.tags else [],
-        created_at=task.created_at,
-        updated_at=task.updated_at,
-    )
+    # Deployment-trigger summary — see the PATCH endpoint above
+    trigger_summary = getattr(task, "_semaphore_trigger", None)
+    if trigger_summary:
+        headers["X-Semaphore-Trigger"] = latin1_safe(trigger_summary)
+
+    return _task_json_response(task, headers)
 
 
 @router.delete("/tasks/{task_id}", status_code=204)

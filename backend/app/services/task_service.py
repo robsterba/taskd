@@ -406,8 +406,11 @@ def update_task(
     # deployment BEFORE the change is committed: a trigger failure
     # (SemaphoreTriggerError, surfaced as 502) leaves the task at its
     # previous status, so a "done" task always means the job fired.
+    # On success the summary rides on the task instance as _semaphore_trigger
+    # for the router to surface as an X-Semaphore-Trigger response header
+    # (the GUI turns it into a toast; it is not a column and not persisted).
     if previous_status != "done" and task.status == "done":
-        trigger_for_task(db, task, requester_source)
+        task._semaphore_trigger = trigger_for_task(db, task, requester_source)
 
     # Subtask status changes derive the parent's status while it is active
     parent_changed = None
@@ -493,7 +496,7 @@ def complete_task(
     if task.status != "done":
         # Completing a docker-update-checker task triggers its Semaphore
         # deployment BEFORE the change is committed — see update_task.
-        trigger_for_task(db, task, requester_source)
+        task._semaphore_trigger = trigger_for_task(db, task, requester_source)
 
         task.status = "done"
         task.updated_at = datetime.now(timezone.utc)

@@ -61,7 +61,7 @@ A lightweight, self-hosted task management application with REST API and web GUI
 - **Sorting**: Sort by created, updated, due date, priority, or name
 - **Web GUI**: Responsive React frontend served from the same container
 - **Integration Views**: Tasks created by integrations (e.g. docker-update-checker) get their own read-oriented GUI tab — summary strip, search, and one collapsible card per host — instead of cluttering the main list
-- **Deployment Triggers**: Completing a docker-update-checker image row fires the matching Semaphore stack-update job (per stack; host-level for the parent task). Completions by the integration itself never trigger; failures block the completion.
+- **Deployment Triggers**: Completing a docker-update-checker image row fires the matching Semaphore stack-update job (per stack; host-level for the parent task), with a toast confirming the triggered job. Completions by the integration itself never trigger; failures block the completion.
 - **API**: Full REST API with OpenAPI documentation at `/docs`
 - **Home Assistant**: Native to-do list integration via [ha-taskd](https://github.com/robsterba/ha-taskd)
 - **n8n**: API endpoints purpose-built for workflow automation

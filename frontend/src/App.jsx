@@ -6,6 +6,7 @@ import NotFound from './pages/NotFound'
 import IntegrationView from './pages/IntegrationView'
 import Settings from './components/Settings'
 import Login from './components/Login'
+import Toast from './components/Toast'
 import { apiFetch, UNAUTHORIZED_EVENT } from './utils/api'
 import './App.css'
 import './index.css'
@@ -14,6 +15,7 @@ import './pages/TaskDetail.css'
 import './pages/IntegrationView.css'
 import './pages/NotFound.css'
 import './components/Login.css'
+import './components/Toast.css'
 
 const SETTINGS_STORAGE_KEY = 'taskd:settings'
 const DEFAULT_SETTINGS = {
@@ -32,6 +34,16 @@ function App() {
   const [activeTab, setActiveTab] = useState('main')
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+  const [toasts, setToasts] = useState([])
+
+  const showToast = (message, kind = 'success') => {
+    const id = `${Date.now()}-${Math.random().toString(36).slice(2, 7)}`
+    setToasts(prev => [...prev, { id, message, kind }])
+  }
+
+  const dismissToast = (id) => {
+    setToasts(prev => prev.filter(t => t.id !== id))
+  }
   const [settings, setSettings] = useState(() => {
     try {
       const saved = JSON.parse(localStorage.getItem(SETTINGS_STORAGE_KEY))
@@ -233,6 +245,12 @@ function App() {
         const errorData = await response.json()
         throw new Error(errorData.detail || 'Failed to update task')
       }
+      // Completing a docker-update-checker task fires a Semaphore job;
+      // the backend tells us which one via this header
+      const trigger = response.headers.get('X-Semaphore-Trigger')
+      if (trigger) {
+        showToast(`Deployment triggered: ${trigger}`)
+      }
       await refreshData()
       return await response.json()
     } catch (err) {
@@ -266,6 +284,10 @@ function App() {
         const errorData = await response.json()
         throw new Error(errorData.detail || 'Failed to complete task')
       }
+      const trigger = response.headers.get('X-Semaphore-Trigger')
+      if (trigger) {
+        showToast(`Deployment triggered: ${trigger}`)
+      }
       await refreshData()
       return await response.json()
     } catch (err) {
@@ -280,6 +302,7 @@ function App() {
 
   return (
     <div className="app">
+      <Toast toasts={toasts} onDismiss={dismissToast} />
       <header className="app-header">
         <div className="header-left">
           <h1 onClick={() => navigate('/')}>taskd</h1>

@@ -99,6 +99,10 @@ def test_gui_subtask_completion_triggers_per_stack_template(
 
     assert response.status_code == 200
     assert fake.created == [21]
+    # the trigger summary rides on the response so the GUI can toast it
+    header = response.headers.get("X-Semaphore-Trigger")
+    assert header is not None
+    assert "Stack update - moxy:immich" in header
 
 
 def test_duc_initiated_completion_does_not_trigger(
@@ -113,6 +117,7 @@ def test_duc_initiated_completion_does_not_trigger(
 
     assert response.status_code == 200
     assert fake.created == []
+    assert response.headers.get("X-Semaphore-Trigger") is None
 
 
 def test_unconfigured_integration_completes_without_trigger(
